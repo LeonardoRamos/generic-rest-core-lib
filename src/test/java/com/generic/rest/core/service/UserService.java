@@ -18,7 +18,7 @@ import com.generic.rest.core.domain.User;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.UserRepository;
-import com.generic.rest.core.util.EncrypterUtils;
+import com.generic.rest.core.util.encrypter.BCryptPasswordEncrypter;
 
 @Service
 public class UserService extends BaseApiRestService<User, UserRepository> implements AuthenticationService {
@@ -31,6 +31,8 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	private BCryptPasswordEncrypter passwordEncrypter = new BCryptPasswordEncrypter();
 	
 	@Override
 	protected UserRepository getRepository() {
@@ -50,7 +52,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		if (Boolean.FALSE.equals(EncrypterUtils.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword()))) {
+		if (Boolean.FALSE.equals(passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword()))) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
@@ -60,7 +62,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	@Transactional
 	@Override
 	public User save(User user) throws ApiException {
-		user.setPassword(EncrypterUtils.encryptPassword(user.getPassword()));
+		user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
 		
 		setAddress(user);
 		
@@ -91,7 +93,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			user.setPassword(userDatabase.getPassword());
 		
 		} else if (!userDatabase.getPassword().equals(user.getPassword())) {
-			user.setPassword(EncrypterUtils.encryptPassword(user.getPassword()));
+			user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
 		}
 		
 		setAddress(user);

@@ -7,7 +7,6 @@ import com.generic.rest.core.domain.BaseApiEntity;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.BaseApiRepository;
-import com.generic.rest.core.util.KeyUtils;
 
 public abstract class BaseApiRestService<E extends BaseApiEntity, R extends BaseApiRepository<E>> 
 	extends ApiRestService<E, R>{
@@ -51,7 +50,7 @@ public abstract class BaseApiRestService<E extends BaseApiEntity, R extends Base
 	@Override
    	public E save(E entity) throws ApiException {
    		if (entity.getExternalId() == null || "".equals(entity.getExternalId())) {
-   			entity.setExternalId(KeyUtils.generate());
+   			entity.setExternalId(getExternalIdGenerator().generate());
    		}
    		
    		entity.setInsertDate(Calendar.getInstance());
