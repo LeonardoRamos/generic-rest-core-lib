@@ -12,16 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.generic.rest.core.ApiConstants.CONTROLLER.LOGIN;
 import com.generic.rest.core.ApiConstants.MSGERROR;
-import com.generic.rest.core.BaseConstants;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.domain.Address;
-import com.generic.rest.core.domain.Role;
 import com.generic.rest.core.domain.User;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.UserRepository;
-import com.generic.rest.core.util.EncrypterUtils;
-import com.generic.rest.core.util.TokenUtils;
+import com.generic.rest.core.util.encrypter.BCryptPasswordEncrypter;
 
 @Service
 public class UserService extends BaseApiRestService<User, UserRepository> implements AuthenticationService {
@@ -34,6 +31,8 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	private BCryptPasswordEncrypter passwordEncrypter = new BCryptPasswordEncrypter();
 	
 	@Override
 	protected UserRepository getRepository() {
@@ -53,7 +52,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		if (Boolean.FALSE.equals(EncrypterUtils.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword()))) {
+		if (Boolean.FALSE.equals(passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword()))) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
@@ -63,7 +62,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	@Transactional
 	@Override
 	public User save(User user) throws ApiException {
-		user.setPassword(EncrypterUtils.encryptPassword(user.getPassword()));
+		user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
 		
 		setAddress(user);
 		
@@ -94,7 +93,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			user.setPassword(userDatabase.getPassword());
 		
 		} else if (!userDatabase.getPassword().equals(user.getPassword())) {
-			user.setPassword(EncrypterUtils.encryptPassword(user.getPassword()));
+			user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
 		}
 		
 		setAddress(user);
@@ -122,18 +121,4 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 		return userRepository.findByEmailAndActive(email, active);
 	}
 	
-   	public Boolean allowUserAccess(String authorization, String userAccountExternalId) {
-   		String token = TokenUtils.getTokenFromAuthorizationHeader(authorization);
-   		String userAccountExternalIdClaim = tokenService.getTokenClaim(token, BaseConstants.JWTAUTH.CLAIM_EXTERNAL_ID);
-		
-   		return userAccountExternalId.equals(userAccountExternalIdClaim) || allowAdminAccess(authorization);
-   	}
-	
-   	public Boolean allowAdminAccess(String authorization) {
-   		String token = TokenUtils.getTokenFromAuthorizationHeader(authorization);
-   		String roleClaim = tokenService.getTokenClaim(token, BaseConstants.JWTAUTH.CLAIM_CREDENTIAL_ROLE);
-		
-   		return Role.ADMIN.name().equals(roleClaim);
-   	}
-
 }
