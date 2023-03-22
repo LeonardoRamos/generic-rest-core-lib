@@ -2,6 +2,7 @@ package com.generic.rest.core.service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.AuthEntity;
 import com.generic.rest.core.util.StringParserUtils;
-import com.generic.rest.core.util.TokenUtils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -108,7 +108,21 @@ public class TokenService {
 			return token;
 		}
 		
-		return TokenUtils.getTokenFromAuthorizationHeader(request.getHeader(JWTAUTH.AUTHORIZATION));
+		return getTokenFromAuthorizationHeader(request.getHeader(JWTAUTH.AUTHORIZATION));
 	}
+	
+	public String getTokenFromAuthorizationHeader(String authorizationHeader) {
+		if (authorizationHeader != null && !"".equals(authorizationHeader)) {
+			List<String> authorizationHeaderData = StringParserUtils.splitStringList(authorizationHeader, ' ');
+			
+			if (authorizationHeaderData != null && authorizationHeaderData.size() > 1 && 
+					authorizationHeaderData.get(0).equals(JWTAUTH.BEARER)) {
+				
+				return authorizationHeaderData.get(1);
+			}
+		}	
+		
+		return null;
+   }
 
 }
