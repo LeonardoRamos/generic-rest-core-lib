@@ -174,8 +174,8 @@ public class ExperimentService extends BaseApiRestService<Experiment, Experiment
   
   @Override
   protected ExternalIdGenerator getExternalIdGenerator() {
-		return new MyExternalIdGenerator();
-	}
+	return new MyExternalIdGenerator();
+  }
 }
 ```
 
