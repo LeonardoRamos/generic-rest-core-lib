@@ -29,7 +29,7 @@ public abstract class ApiRestService<E extends BaseEntity, R extends BaseReposit
 	
 	protected ExternalIdGenerator getExternalIdGenerator() {
 		return new UUIDExternalIdGenerator();
-	};
+	}
 	
 	public ApiResponse<E> findAll(RequestFilter requestFilter) throws ApiException {
 		ApiResponse<E> response = new ApiResponse<>();
