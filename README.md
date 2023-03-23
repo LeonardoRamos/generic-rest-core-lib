@@ -7,6 +7,14 @@ Lib for API Rest developed using *Java*. Its purpose is to serve as a lib to mak
 
 Import the dependency on your project. POC example https://github.com/LeonardoRamos/java-generic-rest-api.
 
+```xml
+<dependency>
+   <groupId>com.generic.rest.core</groupId>
+   <artifactId>generic-rest-core-lib</artifactId>
+   <version>1.0.0</version>
+</dependency>
+```
+
 #### Creating Basic entities (entities with field primary key ID)
 
 - #### Entity layer
