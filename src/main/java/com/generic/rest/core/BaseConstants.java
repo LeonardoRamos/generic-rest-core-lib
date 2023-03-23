@@ -67,10 +67,10 @@ public final class BaseConstants {
 			
 		}
 		
-		public static final String EXPIRATION_TIME = "${jwt.expiration}";
-		public static final String SECRET = "${jwt.secret}";
-		public static final String TOKEN_PREFIX = "${jwt.prefix}";
-		public static final String HEADER_STRINGS = "${jwt.header.strings}";
+		public static final String EXPIRATION_TIME = "${jwt.expiration:86000000}";
+		public static final String SECRET = "${jwt.secret:6cfaef779158723ca4998ec416d18eb8}";
+		public static final String TOKEN_PREFIX = "${jwt.prefix:Bearer}";
+		public static final String HEADER_STRINGS = "${jwt.header.strings:Authorization}";
 		public static final String CLAIM_PRINCIPAL_CREDENTIAL = "email";
 		public static final String CLAIM_ADDITIONAL_INFO = "name";
 		public static final String CLAIM_CREDENTIAL_ROLE = "role";

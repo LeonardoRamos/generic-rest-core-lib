@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -21,7 +20,6 @@ import com.generic.rest.core.BaseConstants.ERRORKEYS;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.ApiException;
 
-@Component
 public class ErrorParser {
 	
 	private static Logger log = LoggerFactory.getLogger(ErrorParser.class);
