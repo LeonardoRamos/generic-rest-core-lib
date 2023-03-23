@@ -7,9 +7,9 @@ Lib for API Rest developed using *Java*. Its purpose is to serve as a lib to mak
 
 Import the dependency on your project. POC example https://github.com/LeonardoRamos/java-generic-rest-api.
 
-### Creating Basic entities (entities with field primary key ID)
+#### Creating Basic entities (entities with field primary key ID)
 
-#### Entity layer
+- #### Entity layer
 ```java
 @Entity
 @Table(name = "car")
@@ -20,7 +20,7 @@ public class Car extends BaseEntity {
 } 
 ```
 
-#### Repository layer
+- #### Repository layer
 
 ```java
 @Repository
@@ -29,7 +29,7 @@ public interface CarRepository extends BaseRepository<Car> {
 }
 ```
 
-#### Service layer
+- #### Service layer
 
 ```java
 @Service
@@ -50,7 +50,7 @@ public class CarService extends BaseRestService<Car, CarRepository> {
 }
 ```
 
-#### Controller layer
+- #### Controller layer
 
 ```java
 @RestController
@@ -68,9 +68,9 @@ public class AddressController extends BaseRestController<Car, CarService>{
 }
 ```
 
-### Creating API entities (entities with the following mandatory fields: id; externalId; insertDate; updateDate; deleteDate; active)
+#### Creating API entities (entities with the following mandatory fields: id; externalId; insertDate; updateDate; deleteDate; active)
 
-#### Entity layer
+- #### Entity layer
 
 ```java
 @Entity
@@ -82,7 +82,7 @@ public class Experiment extends BaseApiEntity {
 } 
 ```
 
-#### Repository layer
+- #### Repository layer
 
 ```java
 @Repository
@@ -92,7 +92,7 @@ public interface ExperimentRepository extends BaseApiRepository<Experiment> {
 
 ```
 
-#### Service layer
+- #### Service layer
 
 ```java
 @Service
@@ -113,7 +113,7 @@ public class ExperimentService extends BaseApiRestService<Experiment, Experiment
 }
 ```
 
-#### Controller layer
+- #### Controller layer
 
 ```java
 @RestController
@@ -131,9 +131,9 @@ public class ExperimentController extends BaseApiRestController<Experiment, Expe
 }
 ```
 
-### Security and auth components
+#### Security and auth components
 
-#### Authentication entity for token claims data
+- #### Authentication entity for token claims data
 
 ```java
 @Entity
@@ -145,7 +145,7 @@ public class User extends BaseApiEntity implements AuthEntity {
 }
 ```
 
-#### External Id generation format, by default, implements UUID 32 characters generation. It's possible to implement its own 32 characters serial Id by overriding the following:
+- #### External Id generation format, by default, implements UUID 32 characters generation. It's possible to implement its own 32 characters serial Id by overriding the following:
 
 ```java
 @Service
