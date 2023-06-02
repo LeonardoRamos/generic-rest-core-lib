@@ -67,6 +67,7 @@ public final class BaseConstants {
 			
 		}
 		
+		public static final String AUTH_DISABLED = "${jwt.auth.disabled:false}";
 		public static final String EXPIRATION_TIME = "${jwt.expiration:86000000}";
 		public static final String SECRET = "${jwt.secret:6cfaef779158723ca4998ec416d18eb8}";
 		public static final String TOKEN_PREFIX = "${jwt.prefix:Bearer}";
