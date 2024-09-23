@@ -52,7 +52,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		if (!passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword())) {
+		if (!this.passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword())) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
@@ -62,14 +62,14 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	@Transactional
 	@Override
 	public User save(User user) throws ApiException {
-		user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
+		user.setPassword(this.passwordEncrypter.encryptPassword(user.getPassword()));
 		
 		this.setAddress(user);
 		
 		User userSaved = super.save(user);
 		userSaved.getAddress().setUser(userSaved);
 		
-		addressService.save(userSaved.getAddress());
+		this.addressService.save(userSaved.getAddress());
 		
 		return userSaved;
 	}
@@ -103,22 +103,22 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	
 	private void setAddress(User user) {
 		if (user.getAddress().getExternalId() == null || "".equals(user.getAddress().getExternalId())) {
-			user.setAddress(addressService.save(user.getAddress()));
+			user.setAddress(this.addressService.save(user.getAddress()));
 			return;
 		}
 		
 		try {
-			Address address = addressService.getByExternalId(user.getAddress().getExternalId());
+			Address address = this.addressService.getByExternalId(user.getAddress().getExternalId());
 			address.setUser(user);
-			user.setAddress(addressService.merge(user.getAddress(), address));
+			user.setAddress(this.addressService.merge(user.getAddress(), address));
 			
 		} catch (NotFoundApiException e) {
-			user.setAddress(addressService.save(user.getAddress()));
+			user.setAddress(this.addressService.save(user.getAddress()));
 		}
 	}
 	
 	public User getUserByEmailAndActive(String email, boolean active) {
-		return userRepository.findByEmailAndActive(email, active);
+		return this.userRepository.findByEmailAndActive(email, active);
 	}
 	
 }

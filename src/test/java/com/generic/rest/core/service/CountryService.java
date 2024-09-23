@@ -36,7 +36,7 @@ public class CountryService extends BaseApiRestService<Country, CountryRepositor
 	}
 	
 	public Country getByName(String name) {
-		return countryRepository.findByName(name != null ? name.toUpperCase() : name);
+		return this.countryRepository.findByName(name != null ? name.toUpperCase() : name);
 	}
 	
 }

@@ -29,7 +29,7 @@ public class AddressService extends BaseApiRestService<Address, AddressRepositor
 	
 	@Override
 	public Address save(Address address) throws ApiException {
-		setCountry(address);
+		this.setCountry(address);
 		return super.save(address);
 	}
 	
@@ -42,7 +42,7 @@ public class AddressService extends BaseApiRestService<Address, AddressRepositor
 	
 	@Override
 	public Address update(Address address) throws ApiException {
-		setCountry(address);
+		this.setCountry(address);
 		return super.update(address);
 	}
 
