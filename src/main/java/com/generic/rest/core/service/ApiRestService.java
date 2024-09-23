@@ -33,14 +33,14 @@ public abstract class ApiRestService<E extends BaseEntity, R extends BaseReposit
 	
 	public ApiResponse<E> findAll(RequestFilter requestFilter) throws ApiException {
 		ApiResponse<E> response = new ApiResponse<>();
-		List<E> records = findAllRecords(requestFilter);
+		List<E> records = this.findAllRecords(requestFilter);
 		response.setRecords(records);
 		
 		ApiMetadata metadata = new ApiMetadata();
-		metadata.setTotalCount(countAll(requestFilter));
+		metadata.setTotalCount(this.countAll(requestFilter));
 		metadata.setPageOffset(requestFilter.getFetchOffset());
 		
-		if (Boolean.TRUE.equals(requestFilter.hasValidAggregateFunction())) {
+		if (requestFilter.hasValidAggregateFunction()) {
 			metadata.setPageSize(records.size());
 		} else {
 			metadata.setPageSize(requestFilter.getFetchLimit());
@@ -52,23 +52,23 @@ public abstract class ApiRestService<E extends BaseEntity, R extends BaseReposit
 	}
 	
 	public Long countAll(RequestFilter requestFilter) throws ApiException {
-		return apiRepository.countAll(getEntityClass(), requestFilter);
+		return this.apiRepository.countAll(this.getEntityClass(), requestFilter);
 	}
 	
 	public List<E> findAllRecords(RequestFilter requestFilter) throws ApiException {
-		return apiRepository.findAll(getEntityClass(), requestFilter);
+		return this.apiRepository.findAll(this.getEntityClass(), requestFilter);
 	}
 	
 	public Page<E> findAll(Pageable pageable) {
-		return getRepository().findAll(pageable);
+		return this.getRepository().findAll(pageable);
 	}
 	
 	public Page<E> findAll(Example<E> example, Pageable pageable) {
-		return getRepository().findAll(example, pageable);
+		return this.getRepository().findAll(example, pageable);
 	}
 	
    	public void deleteInBatch(List<E> entities) {
-	   	getRepository().deleteInBatch(entities);
+   		this.getRepository().deleteInBatch(entities);
    	}
    	
    	public abstract E update(E entity) throws ApiException;

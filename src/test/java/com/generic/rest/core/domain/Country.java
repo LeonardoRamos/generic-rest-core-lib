@@ -17,7 +17,7 @@ public class Country extends BaseApiEntity {
 		this.name = builder.name;
 		this.setId(builder.getId());
 		this.setExternalId(builder.getExternalId());
-		this.setActive(builder.getActive());
+		this.setActive(builder.isActive());
 		this.setInsertDate(builder.getInsertDate());
 		this.setUpdateDate(builder.getUpdateDate());
 		this.setDeleteDate(builder.getRemoveDate());

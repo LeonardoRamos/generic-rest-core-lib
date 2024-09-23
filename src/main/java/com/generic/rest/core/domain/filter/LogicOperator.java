@@ -1,5 +1,7 @@
 package com.generic.rest.core.domain.filter;
 
+import java.util.Arrays;
+
 public enum LogicOperator {
 	
 	OR("_or_", ","), 
@@ -21,25 +23,22 @@ public enum LogicOperator {
 		return operatorAlias;
 	}
 	
-	public static LogicOperator getLogicOperator(String logicalOperator) {
-		if (Boolean.TRUE.equals(LogicOperator.isOrOperator(logicalOperator))) {
-			return LogicOperator.OR;
-		
-		} else if (Boolean.TRUE.equals(LogicOperator.isAndOperator(logicalOperator))) {
-			return LogicOperator.AND;
-		}
-		
-		return null;
+	public static LogicOperator of(String logicalOperator) {
+		return Arrays.stream(values())
+					.filter(lo -> lo.operator.equalsIgnoreCase(logicalOperator) || lo.operatorAlias.equalsIgnoreCase(logicalOperator) || 
+							lo.name().equalsIgnoreCase(logicalOperator))
+					.findFirst()
+					.orElse(null);
 	}
 	
-	public static Boolean isOrOperator(String logicOperator) {
-		return OR.operator.equalsIgnoreCase(logicOperator) || OR.operatorAlias.equalsIgnoreCase(logicOperator) || 
-				OR.name().equalsIgnoreCase(logicOperator);
+	public static boolean isOrOperator(String logicalOperator) {
+		return OR.operator.equalsIgnoreCase(logicalOperator) || OR.operatorAlias.equalsIgnoreCase(logicalOperator) || 
+				OR.name().equalsIgnoreCase(logicalOperator);
 	}
 	
-	public static Boolean isAndOperator(String logicOperator) {
-		return AND.operator.equalsIgnoreCase(logicOperator) || AND.operatorAlias.equalsIgnoreCase(logicOperator) ||
-				AND.name().equalsIgnoreCase(logicOperator);
+	public static boolean isAndOperator(String logicalOperator) {
+		return AND.operator.equalsIgnoreCase(logicalOperator) || AND.operatorAlias.equalsIgnoreCase(logicalOperator) ||
+				AND.name().equalsIgnoreCase(logicalOperator);
 	}
 	
 }

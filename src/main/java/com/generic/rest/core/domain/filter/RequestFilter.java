@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.generic.rest.core.util.StringParserUtils;
 
+import io.micrometer.core.instrument.util.StringUtils;
+
 public class RequestFilter {
 	
 	private String filter;
@@ -21,24 +23,6 @@ public class RequestFilter {
 	public static final Integer DEFAULT_LIMIT = 20;
 	public static final Integer MAX_LIMIT = 100;
 	
-	public void processSymbols() {
-		if (filter != null) {
-			filter = StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", "");
-			filter = StringParserUtils.replace(filter, LogicOperator.AND.getOperatorAlias(), LogicOperator.AND.getOperator());
-			filter = StringParserUtils.replace(filter, LogicOperator.OR.getOperatorAlias(), LogicOperator.OR.getOperator());
-			
-			parseFilterOperators();
-		}
-
-		projection = normalizeSymbol(projection);
-		sum = normalizeSymbol(sum);
-		avg = normalizeSymbol(avg);
-		count = normalizeSymbol(count);
-		countDistinct = normalizeSymbol(countDistinct);
-		groupBy = normalizeSymbol(groupBy);
-		sort = normalizeSymbol(sort);
-	}
-
 	private String normalizeSymbol(String symbol) {
 		if (symbol != null) {
 			symbol = StringParserUtils.replace(StringParserUtils.replace(symbol, "[", ""), "]", "");
@@ -47,7 +31,7 @@ public class RequestFilter {
 		return symbol;
 	}
 
-	private void parseFilterOperators() {
+	private String parseFilterOperators(String filter) {
 		FilterOperator[] operators = new FilterOperator[] { FilterOperator.EQ, FilterOperator.GT, FilterOperator.LT };
 		List<FilterOperator> simpleCharOperator = Arrays.asList(operators);
 		
@@ -62,16 +46,18 @@ public class RequestFilter {
 			filter = StringParserUtils.replace(filter, simpleCharfilterOperator.getOperatorCommonAlias(), simpleCharfilterOperator.getParseableOperator());
 			filter = StringParserUtils.replace(filter, simpleCharfilterOperator.getOperatorAlias(), simpleCharfilterOperator.getParseableOperator());
 		}
+		
+		return filter;
 	}
 	
 	public void addAndFilter(String filterName, Object filterValue, FilterOperator filterOperator) {
-		if (filter == null || "".equals(filter) || "[]".equals(filter)) {
-			filter = new StringBuilder(filterName)
+		if (StringUtils.isBlank(this.filter) || "[]".equals(this.filter)) {
+			this.filter = new StringBuilder(filterName)
 					.append(filterOperator.getParseableOperator())
 					.append(filterValue.toString()).toString();
 		} else {
 			if (FilterOperator.IN.equals(filterOperator) || FilterOperator.OU.equals(filterOperator)) {
-				filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", ""))
+				this.filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(this.filter, "[", ""), "]", ""))
 						.append(LogicOperator.AND.getOperator())
 						.append(filterName)
 						.append(filterOperator.getParseableOperator())
@@ -79,7 +65,7 @@ public class RequestFilter {
 						.append(filterValue.toString())
 						.append(")").toString();
 			} else {
-				filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", ""))
+				this.filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(this.filter, "[", ""), "]", ""))
 						.append(LogicOperator.AND.getOperator())
 						.append(filterName)
 						.append(filterOperator.getParseableOperator())
@@ -91,21 +77,21 @@ public class RequestFilter {
 	public void addCountField(List<String> fieldNames) {
         if (fieldNames != null && !fieldNames.isEmpty()) {
             for (String fieldName : fieldNames) {
-                addCountField(fieldName);
+                this.addCountField(fieldName);
             }
         }
     }
     
     public void addCountField(String fieldName) {
         StringBuilder countFields = new StringBuilder();
-        if (count == null || "".equals(count)) {
-            count = countFields.append("[")
+        if (StringUtils.isBlank(this.count)) {
+        	this.count = countFields.append("[")
                 .append(fieldName)
                 .append("]")
                 .toString();
         
         } else {
-            count = countFields.append(StringParserUtils.replace(count, "]", ","))
+        	this.count = countFields.append(StringParserUtils.replace(this.count, "]", ","))
                 .append(fieldName)
                 .append("]")
                 .toString();
@@ -115,21 +101,21 @@ public class RequestFilter {
     public void addCountDistinctField(List<String> fieldNames) {
         if (fieldNames != null && !fieldNames.isEmpty()) {
             for (String fieldName : fieldNames) {
-                addCountDistinctField(fieldName);
+                this.addCountDistinctField(fieldName);
             }
         }
     }
     
     public void addCountDistinctField(String fieldName) {
         StringBuilder countDistinctFields = new StringBuilder();
-        if (countDistinct == null || "".equals(countDistinct)) {
-            countDistinct = countDistinctFields.append("[")
+        if (this.countDistinct == null || "".equals(this.countDistinct)) {
+        	this.countDistinct = countDistinctFields.append("[")
                 .append(fieldName)
                 .append("]")
                 .toString();
         
         } else {
-            countDistinct = countDistinctFields.append(StringParserUtils.replace(countDistinct, "]", ","))
+        	this.countDistinct = countDistinctFields.append(StringParserUtils.replace(this.countDistinct, "]", ","))
                 .append(fieldName)
                 .append("]")
                 .toString();
@@ -139,21 +125,21 @@ public class RequestFilter {
     public void addSumField(List<String> fieldNames) {
         if (fieldNames != null && !fieldNames.isEmpty()) {
             for (String fieldName : fieldNames) {
-                addSumField(fieldName);
+                this.addSumField(fieldName);
             }
         }
     }
     
     public void addSumField(String fieldName) {
         StringBuilder sumFields = new StringBuilder();
-        if (sum == null || "".equals(sum)) {
-            countDistinct = sumFields.append("[")
+        if (StringUtils.isBlank(this.sum)) {
+        	this.countDistinct = sumFields.append("[")
                 .append(fieldName)
                 .append("]")
                 .toString();
         
         } else {
-            sum = sumFields.append(StringParserUtils.replace(sum, "]", ","))
+        	this.sum = sumFields.append(StringParserUtils.replace(this.sum, "]", ","))
                 .append(fieldName)
                 .append("]")
                 .toString();
@@ -163,21 +149,21 @@ public class RequestFilter {
     public void addAvgField(List<String> fieldNames) {
         if (fieldNames != null && !fieldNames.isEmpty()) {
             for (String fieldName : fieldNames) {
-                addAvgField(fieldName);
+                this.addAvgField(fieldName);
             }
         }
     }
     
     public void addAvgField(String fieldName) {
         StringBuilder avgFields = new StringBuilder();
-        if (avg == null || "".equals(avg)) {
-            countDistinct = avgFields.append("[")
+        if (StringUtils.isBlank(this.avg)) {
+        	this.countDistinct = avgFields.append("[")
                 .append(fieldName)
                 .append("]")
                 .toString();
         
         } else {
-            avg = avgFields.append(StringParserUtils.replace(avg, "]", ","))
+        	this.avg = avgFields.append(StringParserUtils.replace(this.avg, "]", ","))
                 .append(fieldName)
                 .append("]")
                 .toString();
@@ -187,21 +173,21 @@ public class RequestFilter {
     public void addGroupByField(List<String> fieldNames) {
         if (fieldNames != null && !fieldNames.isEmpty()) {
             for (String fieldName : fieldNames) {
-                addGroupByField(fieldName);
+                this.addGroupByField(fieldName);
             }
         }
     }
     
     public void addGroupByField(String fieldName) {
         StringBuilder groupByFields = new StringBuilder();
-        if (groupBy == null || "".equals(groupBy)) {
-            groupBy = groupByFields.append("[")
+        if (StringUtils.isBlank(this.groupBy)) {
+        	this.groupBy = groupByFields.append("[")
                 .append(fieldName)
                 .append("]")
                 .toString();
         
         } else {
-            groupBy = groupByFields.append(StringParserUtils.replace(groupBy, "]", ","))
+        	this.groupBy = groupByFields.append(StringParserUtils.replace(this.groupBy, "]", ","))
                 .append(fieldName)
                 .append("]")
                 .toString();
@@ -210,8 +196,8 @@ public class RequestFilter {
     
     public void addSortField(String fieldName, SortOrder sortOrder) {
         StringBuilder sortFields = new StringBuilder();
-        if (sort == null || "".equals(sort)) {
-            sort = sortFields.append("[")
+        if (StringUtils.isBlank(this.sort)) {
+        	this.sort = sortFields.append("[")
                 .append(fieldName)
                 .append("=")
                 .append(sortOrder.name())
@@ -219,7 +205,7 @@ public class RequestFilter {
                 .toString();
         
         } else {
-            sort = sortFields.append(StringParserUtils.replace(sort, "]", ","))
+        	this.sort = sortFields.append(StringParserUtils.replace(this.sort, "]", ","))
                 .append(fieldName)
                 .append("=")
                 .append(sortOrder.name())
@@ -229,13 +215,13 @@ public class RequestFilter {
     }
 
 	public void addOrFilter(String filterName, String filterValue, FilterOperator filterOperator) {
-		if (filter == null || "".equals(filter) || "[]".equals(filter)) {
-			filter = new StringBuilder(filterName)
+		if (StringUtils.isBlank(this.filter) || "[]".equals(filter)) {
+			this.filter = new StringBuilder(filterName)
 					.append(filterOperator.getParseableOperator())
 					.append(filterValue).toString();
 		} else {
 			if (FilterOperator.IN.equals(filterOperator) || FilterOperator.OU.equals(filterOperator)) {
-				filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", ""))
+				this.filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(this.filter, "[", ""), "]", ""))
 						.append(LogicOperator.OR.getOperator())
 						.append(filterName)
 						.append(filterOperator.getParseableOperator())
@@ -243,7 +229,7 @@ public class RequestFilter {
 						.append(filterValue)
 						.append(")").toString();
 			} else {
-				filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", ""))
+				this.filter = new StringBuilder(StringParserUtils.replace(StringParserUtils.replace(this.filter, "[", ""), "]", ""))
 						.append(LogicOperator.OR.getOperator())
 						.append(filterName)
 						.append(filterOperator.getParseableOperator())
@@ -252,11 +238,11 @@ public class RequestFilter {
 		}
 	}
 	
-	public Boolean hasValidAggregateFunction() {
-		return (sum != null && !"".equals(sum)) || 
-				(avg != null && !"".equals(avg)) || 
-				(count != null && !"".equals(count)) ||
-				(countDistinct != null && !"".equals(countDistinct));
+	public boolean hasValidAggregateFunction() {
+		return StringUtils.isNotBlank(this.sum) || 
+			   StringUtils.isNotBlank(this.avg) || 
+			   StringUtils.isNotBlank(this.count) ||
+			   StringUtils.isNotBlank(this.countDistinct);
 	}
 	
 	public String getFilter() {
@@ -264,6 +250,13 @@ public class RequestFilter {
 	}
 
 	public void setFilter(String filter) {
+		if (filter != null) {
+			filter = StringParserUtils.replace(StringParserUtils.replace(filter, "[", ""), "]", "");
+			filter = StringParserUtils.replace(filter, LogicOperator.AND.getOperatorAlias(), LogicOperator.AND.getOperator());
+			filter = StringParserUtils.replace(filter, LogicOperator.OR.getOperatorAlias(), LogicOperator.OR.getOperator());
+			
+			filter = this.parseFilterOperators(filter);
+		}
 		this.filter = filter;
 	}
 
@@ -271,11 +264,10 @@ public class RequestFilter {
 		return projection;
 	}
 	
-	public List<String> getParsedProjection() {
-		return StringParserUtils.splitStringList(projection, ',');
-	}
-	
 	public void setProjection(String projection) {
+		if (projection != null) {
+			projection = this.normalizeSymbol(projection);
+		}
 		this.projection = projection;
 	}
 
@@ -284,6 +276,9 @@ public class RequestFilter {
 	}
 
 	public void setSort(String sort) {
+		if (sort != null) {
+			sort = this.normalizeSymbol(sort);
+		}
 		this.sort = sort;
 	}
 
@@ -314,11 +309,11 @@ public class RequestFilter {
 	}
 	
 	public Integer getFetchLimit() {
-		if (limit == null || "".equals(limit)) {
+		if (StringUtils.isBlank(this.limit)) {
 			return DEFAULT_LIMIT;
 		}
 		
-		Integer fetchLimit = Integer.parseInt(limit);
+		Integer fetchLimit = Integer.parseInt(this.limit);
 		
 		return fetchLimit <= MAX_LIMIT ? fetchLimit : MAX_LIMIT;
 	}
@@ -337,11 +332,10 @@ public class RequestFilter {
 		return sum;
 	}
 	
-	public List<String> getParsedSum() {
-		return StringParserUtils.splitStringList(sum, ',');
-	}
-
 	public void setSum(String sum) {
+		if (sum != null) {
+			sum = this.normalizeSymbol(sum);
+		}
 		this.sum = sum;
 	}
 	
@@ -349,11 +343,10 @@ public class RequestFilter {
 		return avg;
 	}
 	
-	public List<String> getParsedAvg() {
-		return StringParserUtils.splitStringList(avg, ',');
-	}
-
 	public void setAvg(String avg) {
+		if (avg != null) {
+			avg = this.normalizeSymbol(avg);
+		}
 		this.avg = avg;
 	}
 
@@ -361,11 +354,10 @@ public class RequestFilter {
 		return groupBy;
 	}
 	
-	public List<String> getParsedGroupBy() {
-		return StringParserUtils.splitStringList(groupBy, ',');
-	}
-
 	public void setGroupBy(String groupBy) {
+		if (groupBy != null) {
+			groupBy = this.normalizeSymbol(groupBy);
+		}
 		this.groupBy = groupBy;
 	}
 	
@@ -373,11 +365,10 @@ public class RequestFilter {
 		return count;
 	}
 	
-	public List<String> getParsedCount() {
-		return StringParserUtils.splitStringList(count, ',');
-	}
-
 	public void setCount(String count) {
+		if (count != null) {
+			count = this.normalizeSymbol(count);
+		}
 		this.count = count;
 	}
 	
@@ -385,11 +376,10 @@ public class RequestFilter {
 		return countDistinct;
 	}
 	
-	public List<String> getParsedCountDistinct() {
-		return StringParserUtils.splitStringList(countDistinct, ',');
-	}
-
 	public void setCountDistinct(String countDistinct) {
+		if (countDistinct != null) {
+			countDistinct = this.normalizeSymbol(countDistinct);
+		}
 		this.countDistinct = countDistinct;
 	}
 

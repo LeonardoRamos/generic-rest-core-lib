@@ -104,7 +104,7 @@ public class ReflectionUtils {
 	}
 
 	private static Object getCalendarFieldValue(String value) {
-		if (Boolean.TRUE.equals(StringParserUtils.isNumeric(value))) {
+		if (StringParserUtils.isNumeric(value)) {
 			return CalendarUtils.createCalendarFromMiliseconds(Double.valueOf(value).longValue());
 		}
 		return CalendarUtils.createCalendarFromString(value, BaseConstants.DEFAULT_DATE_FORMAT);

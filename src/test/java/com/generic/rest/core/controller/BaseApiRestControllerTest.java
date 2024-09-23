@@ -132,7 +132,7 @@ class BaseApiRestControllerTest {
 				.build();
     	 
 		Address address = Address.builder()
-				.street("Street Test 11")
+				.street(newUserStreet)
 				.state("RJ")
 				.streetNumber("Street 11")
 				.country(country)

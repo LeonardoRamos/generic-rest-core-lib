@@ -13,7 +13,7 @@ public abstract class BaseRestService<E extends BaseEntity, R extends BaseReposi
 	
 	public E findById(Long id) throws NotFoundApiException {
 		try {
-			return getRepository().getOne(id);
+			return this.getRepository().getOne(id);
 			
 		} catch (EntityNotFoundException e) {
 			throw new NotFoundApiException(String.format(MSGERROR.BASE_ENTITY_NOT_FOUND_ERROR, id));
@@ -24,28 +24,28 @@ public abstract class BaseRestService<E extends BaseEntity, R extends BaseReposi
 	public E update(E entity) throws ApiException {
 		validateExists(entity.getId());
 		
-		return getRepository().saveAndFlush(entity);
+		return this.getRepository().saveAndFlush(entity);
 	}
 	
-	public Boolean delete(Long id) throws ApiException {
+	public boolean delete(Long id) throws ApiException {
 		validateExists(id);
 		
-		getRepository().deleteById(id);
+		this.getRepository().deleteById(id);
 	   
-	   	return Boolean.TRUE;
+	   	return true;
    	}
 
 	private void validateExists(Long id) throws NotFoundApiException {
-		Boolean existsEntity = getRepository().existsById(id);
+		boolean existsEntity = this.getRepository().existsById(id);
 		
-		if (Boolean.FALSE.equals(existsEntity)) {
+		if (!existsEntity) {
 			throw new NotFoundApiException(String.format(MSGERROR.BASE_ENTITY_NOT_FOUND_ERROR, id));
 		}
 	}
    
 	@Override
    	public E save(E entity) throws ApiException {
-	   	return getRepository().saveAndFlush(entity);
+	   	return this.getRepository().saveAndFlush(entity);
    	}
 	
 }

@@ -61,14 +61,14 @@ public class StringParserUtils {
 	    return source;
 	}
 
-	public static Boolean isNumeric(String value) {
+	public static boolean isNumeric(String value) {
 		for (char ch : value.toCharArray()) {
 			if (!Character.isDigit(ch)) {
-				return Boolean.FALSE;
+				return false;
 			}
 		}
 			
-		return Boolean.TRUE;
+		return true;
 	}
 	
 }

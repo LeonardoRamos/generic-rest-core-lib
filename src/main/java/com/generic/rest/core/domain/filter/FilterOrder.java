@@ -24,7 +24,7 @@ public class FilterOrder {
 		this.sortOrder = sortOrder;
 	}
 	
-	public static List<FilterOrder> buildFilterOrders(String sort) {
+	public static List<FilterOrder> of(String sort) {
 		List<FilterOrder> filterOrders = new ArrayList<>();
 		
 		if (sort == null) {

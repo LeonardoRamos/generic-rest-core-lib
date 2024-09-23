@@ -1,5 +1,7 @@
 package com.generic.rest.core.domain.filter;
 
+import java.util.Arrays;
+
 public enum FilterOperator {
 	
 	EQ("=eq=",  "=", "|eq|"), 
@@ -22,17 +24,13 @@ public enum FilterOperator {
 		this.parseableOperator = parseableOperator;
 	}
 	
-	public static FilterOperator getFilterOperator(String operator) {
-		for (FilterOperator filterOperator : FilterOperator.values()) {
-			if (filterOperator.name().equalsIgnoreCase(operator) || filterOperator.getOperatorAlias().equalsIgnoreCase(operator)
-				|| filterOperator.getOperatorCommonAlias().equalsIgnoreCase(operator)
-				|| filterOperator.getParseableOperator().equalsIgnoreCase(operator)) {
-				
-				return filterOperator;
-			}
-		}
-		
-		return null;
+	public static FilterOperator of(String operator) {
+		return Arrays.stream(values())
+					.filter(fo -> fo.name().equalsIgnoreCase(operator) || fo.getOperatorAlias().equalsIgnoreCase(operator)
+							|| fo.getOperatorCommonAlias().equalsIgnoreCase(operator)
+							|| fo.getParseableOperator().equalsIgnoreCase(operator))
+					.findFirst()
+					.orElse(null);
 	}
 	
 	public String getOperatorAlias() {

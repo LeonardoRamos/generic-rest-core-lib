@@ -37,13 +37,13 @@ public class ApiResultMapper<E extends BaseEntity> {
 			
 			if (row != null) {
 				if (Object[].class.equals(row.getClass())) {
-					entities.add(mapSimpleValuesSelection(entityClass, projection, row));
+					entities.add(this.mapSimpleValuesSelection(entityClass, projection, row));
 					
 				} else if (entityClass.equals(row.getClass())) {
-					entities.add(mapEntityObject(entityClass, projection, row));
+					entities.add(this.mapEntityObject(entityClass, projection, row));
 					
 				} else {
-					entities.add(mapEntityValues(entityClass, projection, row));
+					entities.add(this.mapEntityValues(entityClass, projection, row));
 				}
 			}
 		}
@@ -67,19 +67,19 @@ public class ApiResultMapper<E extends BaseEntity> {
 				AggregationFunction aggregationFunction = (AggregationFunction) projection.get(i);
 				Path<Object> attributePath = (Path<Object>) aggregationFunction.getArgumentExpressions().get(0);
 				
-				if (Boolean.TRUE.equals(AggregateFunction.isCountFunction(aggregationFunction.getFunctionName()))) {
-					object.addCount(mapAggregationField(entityClass, fieldData[i], attributePath));
+				if (AggregateFunction.isCountFunction(aggregationFunction.getFunctionName())) {
+					object.addCount(this.mapAggregationField(entityClass, fieldData[i], attributePath));
 					
-				} else if (Boolean.TRUE.equals(AggregateFunction.isSumFunction(aggregationFunction.getFunctionName()))) {
-					mapSumAggregationValues(entityClass, fieldData[i], object, attributePath);
+				} else if (AggregateFunction.isSumFunction(aggregationFunction.getFunctionName())) {
+					this.mapSumAggregationValues(entityClass, fieldData[i], object, attributePath);
 					
-				} else if (Boolean.TRUE.equals(AggregateFunction.isAvgFunction(aggregationFunction.getFunctionName()))) {
-					mapAvgAggregationValues(entityClass, fieldData[i], object, attributePath);
+				} else if (AggregateFunction.isAvgFunction(aggregationFunction.getFunctionName())) {
+					this.mapAvgAggregationValues(entityClass, fieldData[i], object, attributePath);
 				}
 				
 			} else if (projection != null) {
 				Path<Object> attributePath = (Path<Object>) projection.get(i);
-				mapProjectionField(entityClass, fieldData[i], attributePath, object);
+				this.mapProjectionField(entityClass, fieldData[i], attributePath, object);
 			}
 		}
 		
@@ -103,7 +103,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 		for (Field field : entityClass.getDeclaredFields()) {
 		    field.setAccessible(true);
 		    
-			if (Boolean.TRUE.equals(isInProjection(field.getName(), projection))) {
+			if (this.isInProjection(field.getName(), projection)) {
 				field.set(object, field.get(entity));
 			}
 		}
@@ -111,18 +111,18 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return object;
 	}
 	
-	private Boolean isInProjection(String fieldName, List<Selection<? extends Object>> projection) {
+	private boolean isInProjection(String fieldName, List<Selection<? extends Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
-			return Boolean.FALSE;
+			return false;
 		}
 		
 		for (Selection<? extends Object> projectionField : projection) {
 			if (fieldName.equals(projectionField.getAlias())) {
-				return Boolean.TRUE;
+				return true;
 			}
 		}
 		
-		return Boolean.FALSE;
+		return false;
 	}
 
 	private E mapEntityValues(
@@ -139,18 +139,18 @@ public class ApiResultMapper<E extends BaseEntity> {
 			
 			if (AggregateFunction.isCountFunction(aggregationFunction.getFunctionName()) ||
 					AggregateFunction.isCountDistinctFunction(aggregationFunction.getFunctionName())) {
-				object.addCount(mapAggregationField(entityClass, row, attributePath));
+				object.addCount(this.mapAggregationField(entityClass, row, attributePath));
 				
-			} else if (Boolean.TRUE.equals(AggregateFunction.isSumFunction(aggregationFunction.getFunctionName()))) {
-				mapSumAggregationValues(entityClass, row, object, attributePath);
+			} else if (AggregateFunction.isSumFunction(aggregationFunction.getFunctionName())) {
+				this.mapSumAggregationValues(entityClass, row, object, attributePath);
 				
-			} else if (Boolean.TRUE.equals(AggregateFunction.isAvgFunction(aggregationFunction.getFunctionName()))) {
-				mapAvgAggregationValues(entityClass, row, object, attributePath);
+			} else if (AggregateFunction.isAvgFunction(aggregationFunction.getFunctionName())) {
+				this.mapAvgAggregationValues(entityClass, row, object, attributePath);
 			}
 			
 		} else if (projection != null) {
 			Path<Object> attributePath = (Path<Object>) projection.get(0);
-			mapProjectionField(entityClass, row, attributePath, object);
+			this.mapProjectionField(entityClass, row, attributePath, object);
 		}
 		
 		return object;
@@ -158,30 +158,30 @@ public class ApiResultMapper<E extends BaseEntity> {
 
 	private void mapSumAggregationValues(Class<E> entityClass, Object row, E object, Path<Object> attributePath) {
 		if (row.getClass().equals(Double.class)) {
-			object.addSum(mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
+			object.addSum(this.mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
 		} else {
-			object.addSum(mapAggregationField(entityClass, row, attributePath));
+			object.addSum(this.mapAggregationField(entityClass, row, attributePath));
 		}
 	}
 	
 	private void mapAvgAggregationValues(Class<E> entityClass, Object row, E object, Path<Object> attributePath) {
 		if (row.getClass().equals(Double.class)) {
-			object.addAvg(mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
+			object.addAvg(this.mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
 		} else {
-			object.addAvg(mapAggregationField(entityClass, row, attributePath));
+			object.addAvg(this.mapAggregationField(entityClass, row, attributePath));
 		}
 	}
 	
 	private void mapProjectionField(Class<E> entityClass, Object fieldData, Path<Object> attributePath, E entity) 
 			throws ReflectiveOperationException {
 		
-		List<Map<String, Class>> fieldPaths = buildNestedFields(entityClass, attributePath);
+		List<Map<String, Class>> fieldPaths = this.buildNestedFields(entityClass, attributePath);
 		
 		Integer lastIndex = fieldPaths.size() - 1;
 		Map.Entry<String, Class> rootFieldEntry = fieldPaths.get(lastIndex--).entrySet().iterator().next();
 		
 		if (lastIndex < 0 && fieldPaths.size() == 1) {
-			setLastProjectionNestedField(entityClass, fieldData, entity, rootFieldEntry);
+			this.setLastProjectionNestedField(entityClass, fieldData, entity, rootFieldEntry);
 		
 		} else {
 			Object rootFieldData = rootFieldEntry.getValue().getConstructor().newInstance();
@@ -194,15 +194,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 				Map.Entry<String, Class> fieldEntry = fieldPaths.get(i).entrySet().iterator().next();
 				
 				if (i == 0) {
-					setLastProjectionNestedField(currentData.getClass(), fieldData, currentData, fieldEntry);
-					setProjectionNestedField(rootFieldData, entity, fieldPaths);
+					this.setLastProjectionNestedField(currentData.getClass(), fieldData, currentData, fieldEntry);
+					this.setProjectionNestedField(rootFieldData, entity, fieldPaths);
 					
 				} else {
 					Object currentFieldData = fieldEntry.getValue().getConstructor().newInstance();
 					Field currentField = ReflectionUtils.getEntityFieldByName(currentData.getClass(), fieldEntry.getKey());
 					currentField.setAccessible(true);
 					
-					setFieldValue(currentFieldData, currentData, currentField);
+					this.setFieldValue(currentFieldData, currentData, currentField);
 				
 					currentData = currentFieldData;
 				}
@@ -224,7 +224,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 			Object currentEntityData = currentEntityField.get(currentObject);
 			
 			if (currentEntityData == null) {
-				setFieldValue(currentProjectionObject, currentObject, currentEntityField);
+				this.setFieldValue(currentProjectionObject, currentObject, currentEntityField);
 				break;
 			
 			} else {
@@ -248,7 +248,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 		
 		Field fieldRoot = ReflectionUtils.getEntityFieldByName(clazz, fieldEntry.getKey());
 		fieldRoot.setAccessible(true);
-		setFieldValue(fieldData, object, fieldRoot);
+		this.setFieldValue(fieldData, object, fieldRoot);
 	}
 
 	private List<Map<String, Class>> buildNestedFields(Class<E> entityClass, Path<Object> attributePath) {

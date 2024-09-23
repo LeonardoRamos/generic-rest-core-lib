@@ -19,21 +19,21 @@ import com.generic.rest.core.service.ApiRestService;
 @SuppressWarnings({ "rawtypes", "unchecked"} )
 public abstract class ApiRestController<E extends BaseEntity, S extends ApiRestService> {
 	
-	private static final Logger log = LoggerFactory.getLogger(ApiRestController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApiRestController.class);
 	
 	public abstract S getService();
 	
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<E>> getAll(
     		@ModelAttribute("RequestFilter") RequestFilter requestFilter) throws ApiException {
-    	log.info("Finding Entity by requestFilter=[{}]", requestFilter);
-		return new ResponseEntity<>(getService().findAll(requestFilter), HttpStatus.OK);
+    	LOGGER.info("Finding Entity by requestFilter=[{}]", requestFilter);
+		return new ResponseEntity<>(this.getService().findAll(requestFilter), HttpStatus.OK);
     }
     
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<E> insert(@RequestBody E entity) throws ApiException {
-    	log.info("Processing insert of data: [{}]", entity);
-		return (ResponseEntity<E>) new ResponseEntity<>(getService().save(entity), HttpStatus.CREATED);
+    	LOGGER.info("Processing insert of data: [{}]", entity);
+		return (ResponseEntity<E>) new ResponseEntity<>(this.getService().save(entity), HttpStatus.CREATED);
     }
     
 }

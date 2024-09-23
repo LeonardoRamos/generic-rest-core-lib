@@ -4,6 +4,6 @@ public interface PasswordEncrypter {
 	
 	public String encryptPassword(String passwordToHash);
 	
-	public Boolean matchPassword(String password, String hashedPassword);
+	public boolean matchPassword(String password, String hashedPassword);
 	
 }

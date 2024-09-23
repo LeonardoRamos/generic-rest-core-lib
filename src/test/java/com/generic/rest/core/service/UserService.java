@@ -46,13 +46,13 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	
 	@Override
 	public Map<String, String> attemptAuthentication(Map<String, String> credentials) throws AuthenticationException {
-		User userAccount = getUserByEmailAndActive(credentials.get(LOGIN.EMAIL_FIELD), Boolean.TRUE);
+		User userAccount = getUserByEmailAndActive(credentials.get(LOGIN.EMAIL_FIELD), true);
 		
 		if (userAccount == null) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		if (Boolean.FALSE.equals(passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword()))) {
+		if (!passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword())) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
@@ -64,7 +64,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	public User save(User user) throws ApiException {
 		user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
 		
-		setAddress(user);
+		this.setAddress(user);
 		
 		User userSaved = super.save(user);
 		userSaved.getAddress().setUser(userSaved);
@@ -85,7 +85,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 
 		userDatabase.setUpdateDate(Calendar.getInstance());
       
-		if (user.getActive() != null && user.getActive()) {
+		if (user.isActive()) {
 			user.setDeleteDate(null);
 		}
 		
@@ -117,7 +117,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 		}
 	}
 	
-	public User getUserByEmailAndActive(String email, Boolean active) {
+	public User getUserByEmailAndActive(String email, boolean active) {
 		return userRepository.findByEmailAndActive(email, active);
 	}
 	

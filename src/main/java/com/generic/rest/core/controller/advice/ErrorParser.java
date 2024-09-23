@@ -22,7 +22,7 @@ import com.generic.rest.core.exception.ApiException;
 
 public class ErrorParser {
 	
-	private static Logger log = LoggerFactory.getLogger(ErrorParser.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ErrorParser.class);
 
 	public ResponseEntity<Map<String, Object>> createResponseEntity(List<Map<String, String>> errors, HttpStatus status) {
 		return new ResponseEntity<>(Collections.singletonMap(ERRORKEYS.KEY, errors), status);
@@ -33,7 +33,7 @@ public class ErrorParser {
 
 		if (bindingResult != null) {
 			String message = BaseConstants.MSGERROR.VALIDATION_ERROR;
-			String code = getErrorCode(message);
+			String code = this.getErrorCode(message);
 					
 			for (ObjectError objectError: bindingResult.getAllErrors()) {
 				if (objectError.getDefaultMessage() != null) {
@@ -59,18 +59,18 @@ public class ErrorParser {
 	}
 	
 	public List<Map<String, String>> formatErrorList(ApiException exception) {
-    	return formatErrorList(exception.getCode(), exception.getData());
+    	return this.formatErrorList(exception.getCode(), exception.getData());
 	}
 	
 	public List<Map<String, String>> formatErrorList(String message) {
 		Object [] data = null;
-		return formatErrorList(message, data);
+		return this.formatErrorList(message, data);
 	}
 	
 	public List<Map<String, String>> formatErrorList(String message, Object... data) {
 		List<Map<String, String>> errors = new ArrayList<>();
     	
-    	errors.add(createError(message, data));
+    	errors.add(this.createError(message, data));
 		
     	return errors;
 	}
@@ -78,7 +78,7 @@ public class ErrorParser {
 	private Map<String, String> createError(String message, Object... data) {
 		Map<String, String> error = new HashMap<>();
     	
-		String code = getErrorCode(message);
+		String code = this.getErrorCode(message);
 
 		if (data != null && data.length > 0) {
 			StringBuilder dataMessage = new StringBuilder(message).append(" [");
@@ -115,8 +115,9 @@ public class ErrorParser {
 					}
 				}
 			}
+			
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 		
 		return MSGERROR.DEFAULT_ERROR_CODE;

@@ -12,7 +12,7 @@ public abstract class BaseApiRestService<E extends BaseApiEntity, R extends Base
 	extends ApiRestService<E, R>{
 	
 	public E getByExternalId(String externalId) throws NotFoundApiException {
-		E entity = getRepository().findOneByExternalId(externalId);
+		E entity = this.getRepository().findOneByExternalId(externalId);
 		
 		if (entity == null) {
 			throw new NotFoundApiException(String.format(MSGERROR.ENTITY_NOT_FOUND_ERROR, externalId));
@@ -30,15 +30,15 @@ public abstract class BaseApiRestService<E extends BaseApiEntity, R extends Base
 
 		entity.setUpdateDate(Calendar.getInstance());
       
-		if (entity.getActive() != null && entity.getActive()) {
+		if (entity.isActive()) {
 			entity.setDeleteDate(null);
 		}
       
-		return getRepository().saveAndFlush(entity);
+		return this.getRepository().saveAndFlush(entity);
 	}
 
 	public Integer delete(String externalId) throws ApiException {
-	   	Integer deletedCount = getRepository().deleteByExternalId(externalId);
+	   	Integer deletedCount = this.getRepository().deleteByExternalId(externalId);
 	   
 	   	if (deletedCount == 0) {
 		   	throw new NotFoundApiException(String.format(MSGERROR.ENTITY_NOT_FOUND_ERROR, externalId));
@@ -55,14 +55,9 @@ public abstract class BaseApiRestService<E extends BaseApiEntity, R extends Base
    		
    		entity.setInsertDate(Calendar.getInstance());
    		entity.setUpdateDate(entity.getInsertDate());
-	   
-   		if (entity.getActive() == null) {
-   			entity.setActive(Boolean.TRUE);
-   		}
-	   
    		entity.setDeleteDate(null);
 
-	   	return getRepository().saveAndFlush(entity);
+	   	return this.getRepository().saveAndFlush(entity);
    	}
 	
 }

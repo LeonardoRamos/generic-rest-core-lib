@@ -9,12 +9,12 @@ public class BCryptPasswordEncrypter implements PasswordEncrypter {
 
 	@Override
 	public String encryptPassword(String passwordToHash) {
-		return passwordEncoder.encode(passwordToHash);
+		return this.passwordEncoder.encode(passwordToHash);
 	}
 	
 	@Override
-	public Boolean matchPassword(String password, String hashedPassword) {
-		return passwordEncoder.matches(password, hashedPassword);
+	public boolean matchPassword(String password, String hashedPassword) {
+		return this.passwordEncoder.matches(password, hashedPassword);
 	}
 	
 }

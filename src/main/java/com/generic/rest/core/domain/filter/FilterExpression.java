@@ -30,10 +30,10 @@ public class FilterExpression {
 		this.logicOperator = logicOperator;
 	}
 	
-	public static FilterExpression buildFilterExpressions(String expressionString) {
+	public static FilterExpression of(String expression) {
 		FilterExpression currentExpression = new FilterExpression();
         
-		if (expressionString == null) {
+		if (expression == null) {
 			return currentExpression;
 		}
 		
@@ -41,66 +41,67 @@ public class FilterExpression {
         StringBuilder word = new StringBuilder();
         
         Integer i = 0;
-        while (i < expressionString.length()) {
+        while (i < expression.length()) {
             
-        	if (expressionString.charAt(i) != '_') {
-                word.append(expressionString.charAt(i));
+        	if (expression.charAt(i) != '_') {
+                word.append(expression.charAt(i));
                 
             } else {
-            	LogicOperator logicOperator = processOperator(expressionString, i);
+            	LogicOperator logicOperator = parseNextOperator(expression, i);
 
             	if (logicOperator != null) {
             		currentExpression.setLogicOperator(logicOperator);
-            		currentExpression.setFilterField(FilterField.buildFilterField(word.toString().trim()));
-            		currentExpression = processNewExpressionNode(currentExpression);
+            		currentExpression.setFilterField(FilterField.of(word.toString().trim()));
+            		currentExpression = currentExpression.appendNewNestedExpression();
             		
             		i += logicOperator.getOperator().length() - 1;
             		word = new StringBuilder();
             	
             	} else {
-            		word.append(expressionString.charAt(i));
+            		word.append(expression.charAt(i));
             	}
             }
         	
         	i++;
         }
         
-        currentExpression.setFilterField(FilterField.buildFilterField(word.toString().trim()));
-        processNewExpressionNode(currentExpression);
+        currentExpression.setFilterField(FilterField.of(word.toString().trim()));
+        currentExpression.appendNewNestedExpression();
         
         return initialExpression;
 	}
 	
-	private static FilterExpression processNewExpressionNode(FilterExpression currentExpression) {
-		if (currentExpression.getLogicOperator() != null) {
-    		FilterExpression newExpression = new FilterExpression();
-    		currentExpression.setNestedFilterExpression(newExpression);
-    		currentExpression = currentExpression.getFilterNestedExpression();
+	public FilterExpression appendNewNestedExpression() {
+		if (this.getLogicOperator() != null) {
+    		
+			FilterExpression newExpression = new FilterExpression();
+    		
+			this.setNestedFilterExpression(newExpression);
     	}
 		
-		return currentExpression;
+		return this.getFilterNestedExpression();
 	}
 	
-	private static LogicOperator processOperator(String expressionString, int index) {
+	private static LogicOperator parseNextOperator(String expression, int index) {
 		StringBuilder logicOperator = new StringBuilder();
-		Boolean appendOperation = Boolean.TRUE;
+		boolean appendOperation = true;
 		
 		do {
-			logicOperator.append(expressionString.charAt(index));
+			logicOperator.append(expression.charAt(index));
 		    index++;
 		    
-		    if (index >= expressionString.length() || expressionString.charAt(index) == '_') {
+		    if (index >= expression.length() || expression.charAt(index) == '_') {
 		    	
-		    	appendOperation = Boolean.FALSE;
+		    	appendOperation = false;
 		    	
-		    	if (index < expressionString.length() && expressionString.charAt(index) == '_') {
-		    		logicOperator.append(expressionString.charAt(index));
+		    	if (index < expression.length() && expression.charAt(index) == '_') {
+		    		logicOperator.append(expression.charAt(index));
 		    	}
 		    }
 		    
-		} while (Boolean.TRUE.equals(appendOperation));
+		} while (appendOperation);
 		
-		return LogicOperator.getLogicOperator(logicOperator.toString().trim());
+		return LogicOperator.of(logicOperator.toString().trim());
 	}
 	
 	@Override

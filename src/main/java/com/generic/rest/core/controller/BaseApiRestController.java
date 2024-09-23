@@ -20,26 +20,26 @@ import com.generic.rest.core.service.BaseApiRestService;
 public abstract class BaseApiRestController<E extends BaseApiEntity, S extends BaseApiRestService>
 	extends ApiRestController<E, S> {
 	
-	private static final Logger log = LoggerFactory.getLogger(BaseApiRestController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseApiRestController.class);
 	
 	@GetMapping(value = CONTROLLER.EXTERNAL_ID_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<E> getOne(@PathVariable(CONTROLLER.EXTERNAL_ID) String externalId) throws ApiException {
-    	log.info("Processing get of entity of externalId: [{}]", externalId);
-		return (ResponseEntity<E>) new ResponseEntity<>(getService().getByExternalId(externalId), HttpStatus.OK);
+    	LOGGER.info("Processing get of entity of externalId: [{}]", externalId);
+		return (ResponseEntity<E>) new ResponseEntity<>(this.getService().getByExternalId(externalId), HttpStatus.OK);
     }
 	
     @PutMapping(value = CONTROLLER.EXTERNAL_ID_PATH, 
 			consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<E> update(@PathVariable(CONTROLLER.EXTERNAL_ID) String externalId, 
     		@RequestBody E entity) throws ApiException {
-    	log.info("Processing update of entity of externalId: [{}]", externalId);
-		return (ResponseEntity<E>) new ResponseEntity<>(getService().update(entity), HttpStatus.OK);
+    	LOGGER.info("Processing update of entity of externalId: [{}]", externalId);
+		return (ResponseEntity<E>) new ResponseEntity<>(this.getService().update(entity), HttpStatus.OK);
     }
     
     @DeleteMapping(value = CONTROLLER.EXTERNAL_ID_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> delete(@PathVariable(CONTROLLER.EXTERNAL_ID) String externalId) throws ApiException {
-    	log.info("Processing delete of entity of externalId: [{}]", externalId);
-    	getService().delete(externalId);
+    	LOGGER.info("Processing delete of entity of externalId: [{}]", externalId);
+    	this.getService().delete(externalId);
 		return new ResponseEntity<>(HttpStatus.OK);
     }
     

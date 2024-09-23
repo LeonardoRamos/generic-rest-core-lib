@@ -30,7 +30,7 @@ public class FilterField {
 		this.filterOperator = filterOperator;
 	}
 	
-	public static FilterField buildFilterField(String logicExpression) {
+	public static FilterField of(String logicExpression) {
 		FilterField filterField = new FilterField();
 		
 		if (logicExpression == null || "".equals(logicExpression)) {
@@ -38,8 +38,8 @@ public class FilterField {
 		}
 		
         StringBuilder word = new StringBuilder();
-        
         Integer i = 0;
+        
         while (i < logicExpression.length()) {
           
     		if (logicExpression.charAt(i) != '|') {
@@ -65,7 +65,7 @@ public class FilterField {
 	
 	private static FilterOperator getComparisonOperator(String logicExpression, int i) {
 		StringBuilder operation = new StringBuilder();
-		Boolean appendOperation = Boolean.TRUE; 
+		boolean appendOperation = true; 
 		
 		do {
 			operation.append(logicExpression.charAt(i));
@@ -73,16 +73,16 @@ public class FilterField {
 			
 		    if (i >= logicExpression.length() || logicExpression.charAt(i) == '|') {
 		    	
-		    	appendOperation = Boolean.FALSE;
+		    	appendOperation = false;
 		    	
 		    	if (i < logicExpression.length() && logicExpression.charAt(i) == '|') {
 		    		operation.append(logicExpression.charAt(i));
 		    	}
 		    }
 			
-		} while (Boolean.TRUE.equals(appendOperation));
+		} while (appendOperation);
 		
-		return FilterOperator.getFilterOperator(operation.toString().trim());
+		return FilterOperator.of(operation.toString().trim());
 	}
 
 	@Override

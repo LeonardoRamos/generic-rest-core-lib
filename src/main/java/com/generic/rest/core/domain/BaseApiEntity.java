@@ -17,7 +17,7 @@ public class BaseApiEntity extends BaseEntity {
 	private String externalId;
 	
 	@Column(name = "active", nullable = false)
-	private Boolean active;
+	private boolean active;
 	
 	@Column(name = "creation_date", nullable = false, updatable = false)
 	private Calendar insertDate;
@@ -56,11 +56,11 @@ public class BaseApiEntity extends BaseEntity {
 		this.externalId = externalId;
 	}
 
-	public Boolean getActive() {
+	public boolean isActive() {
 		return active;
 	}
 
-	public void setActive(Boolean active) {
+	public void setActive(boolean active) {
 		this.active = active;
 	}
 
@@ -95,7 +95,7 @@ public class BaseApiEntity extends BaseEntity {
 	public static class BaseApiEntityBuilder extends BaseEntityBuilder {
 		
 		private String externalId;
-		private Boolean active = Boolean.TRUE;
+		private boolean active = true;
 		private Calendar insertDate;
 		private Calendar updateDate;
 		private Calendar removeDate;
@@ -105,7 +105,7 @@ public class BaseApiEntity extends BaseEntity {
 			return this;
 		}
 		
-		public BaseApiEntityBuilder active(Boolean active) {
+		public BaseApiEntityBuilder active(boolean active) {
 			this.active = active;
 			return this;
 		}
@@ -133,11 +133,11 @@ public class BaseApiEntity extends BaseEntity {
 			this.externalId = externalId;
 		}
 
-		public Boolean getActive() {
+		public boolean isActive() {
 			return active;
 		}
 
-		public void setActive(Boolean active) {
+		public void setActive(boolean active) {
 			this.active = active;
 		}
 

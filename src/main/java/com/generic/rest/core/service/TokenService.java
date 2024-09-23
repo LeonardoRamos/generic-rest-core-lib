@@ -20,6 +20,7 @@ import com.generic.rest.core.util.StringParserUtils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.micrometer.core.instrument.util.StringUtils;
 
 @Service
 public class TokenService {
@@ -35,9 +36,6 @@ public class TokenService {
 	@Value(JWTAUTH.TOKEN_PREFIX)
 	private String tokenPrefix;
 	
-	@Value(JWTAUTH.HEADER_STRINGS)
-	private String headerString;
-	
 	public String generateToken(AuthEntity authEntity) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(JWTAUTH.CLAIM_EXTERNAL_ID, authEntity.getExternalId());
@@ -48,31 +46,31 @@ public class TokenService {
 		return Jwts.builder()
 		 		 .setSubject(authEntity.getAdditionalInfo())
 		 		 .setClaims(claims)
-		 		 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-				 .signWith(SignatureAlgorithm.HS512, secret)
+		 		 .setExpiration(new Date(System.currentTimeMillis() + this.expirationTime))
+				 .signWith(SignatureAlgorithm.HS512, this.secret)
 				 .compact();
 	}
 	
-	public Boolean validateToken(String token) {
+	public boolean validateToken(String token) {
 		if (token != null) {
 			try {
 				String userAccountExternalId = (String) Jwts.parser()
 						.setSigningKey(secret)
-						.parseClaimsJws(StringParserUtils.replace(token, tokenPrefix, ""))
+						.parseClaimsJws(StringParserUtils.replace(token, this.tokenPrefix, ""))
 						.getBody()
 						.get(BaseConstants.JWTAUTH.CLAIM_EXTERNAL_ID);
 				
 				if (userAccountExternalId != null && !"".equals(userAccountExternalId)) {
-					return Boolean.TRUE;
+					return true;
 				}
 			} catch (Exception e) {
 				log.error(MSGERROR.AUTH_ERROR_INVALID_TOKEN, token);
-				return Boolean.FALSE;
+				return false;
 			}
 		}
 		
 		log.error(MSGERROR.AUTH_ERROR_INVALID_TOKEN, token);
-		return Boolean.FALSE;
+		return false;
 	}
 	
 	public String getTokenClaim(String token, String tokenClaim) {
@@ -99,16 +97,16 @@ public class TokenService {
 	
 	public String getTokenFromRequest(HttpServletRequest request) {
 		String token = request.getHeader(JWTAUTH.X_ACCESS_TOKEN);
-		if (token != null && !"".equals(token)) {
+		if (StringUtils.isNotBlank(token)) {
 			return token;
 		}
 		
 		token = (String) request.getAttribute(JWTAUTH.TOKEN);
-		if (token != null && !"".equals(token)) {
+		if (StringUtils.isNotBlank(token)) {
 			return token;
 		}
 		
-		return getTokenFromAuthorizationHeader(request.getHeader(JWTAUTH.AUTHORIZATION));
+		return this.getTokenFromAuthorizationHeader(request.getHeader(JWTAUTH.AUTHORIZATION));
 	}
 	
 	public String getTokenFromAuthorizationHeader(String authorizationHeader) {

@@ -16,23 +16,38 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 
+/**
+ * Adapter to configure CORS and intercecptors.
+ * @author leonardo.ramos
+ *
+ */
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 	
 	@Autowired
 	private AuthorizationInterceptor authorizationInterceptor;
 	
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors();
     }
 	
+    /**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(authorizationInterceptor)
+		registry.addInterceptor(this.authorizationInterceptor)
 			.addPathPatterns(JWTAUTH.ALL_PATH_CORS_REGEX);
 	}
 	
+	/**
+	 * Create CORS configuration bean.
+	 * @return CORS configuration bean.
+	 */
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();

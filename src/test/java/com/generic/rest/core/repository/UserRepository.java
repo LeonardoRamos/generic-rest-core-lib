@@ -7,6 +7,6 @@ import com.generic.rest.core.domain.User;
 @Repository
 public interface UserRepository extends BaseApiRepository<User> {
 	
-	User findByEmailAndActive(String email, Boolean active);
+	User findByEmailAndActive(String email, boolean active);
 
 }
