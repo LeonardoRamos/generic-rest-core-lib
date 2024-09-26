@@ -98,7 +98,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 		
 		this.setAddress(user);
 		
-		return this.userRepository.saveAndFlush(user);
+		return this.getRepository().saveAndFlush(user);
 	}
 	
 	private void setAddress(User user) {
@@ -118,7 +118,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	}
 	
 	public User getUserByEmailAndActive(String email, boolean active) {
-		return this.userRepository.findByEmailAndActive(email, active);
+		return this.getRepository().findByEmailAndActive(email, active);
 	}
 	
 }
