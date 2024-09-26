@@ -4,8 +4,6 @@ package com.generic.rest.core.controller.advice;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,6 +23,8 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.ApiException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class ExceptionHandlerControllerAdvice {

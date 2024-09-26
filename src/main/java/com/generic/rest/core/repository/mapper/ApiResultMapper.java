@@ -13,15 +13,17 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Selection;
-
 import org.hibernate.mapping.Set;
-import org.hibernate.query.criteria.internal.expression.function.AggregationFunction;
+import org.hibernate.query.sqm.function.SelfRenderingSqmAggregateFunction;
+import org.hibernate.query.sqm.tree.domain.SqmBasicValuedSimplePath;
+import org.hibernate.query.sqm.tree.expression.SqmDistinct;
 
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.domain.filter.AggregateFunction;
 import com.generic.rest.core.util.ReflectionUtils;
+
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Selection;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ApiResultMapper<E extends BaseEntity> {
@@ -62,25 +64,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 		E object = (E) constructor.newInstance();
 		
 		for (int i = 0; i < fieldData.length; i++) {
-		
-			if (projection != null && projection.get(i) instanceof AggregationFunction) {
-				AggregationFunction aggregationFunction = (AggregationFunction) projection.get(i);
-				Path<Object> attributePath = (Path<Object>) aggregationFunction.getArgumentExpressions().get(0);
-				
-				if (AggregateFunction.isCountFunction(aggregationFunction.getFunctionName())) {
-					object.addCount(this.mapAggregationField(entityClass, fieldData[i], attributePath));
-					
-				} else if (AggregateFunction.isSumFunction(aggregationFunction.getFunctionName())) {
-					this.mapSumAggregationValues(entityClass, fieldData[i], object, attributePath);
-					
-				} else if (AggregateFunction.isAvgFunction(aggregationFunction.getFunctionName())) {
-					this.mapAvgAggregationValues(entityClass, fieldData[i], object, attributePath);
-				}
-				
-			} else if (projection != null) {
-				Path<Object> attributePath = (Path<Object>) projection.get(i);
-				this.mapProjectionField(entityClass, fieldData[i], attributePath, object);
-			}
+			this.mapProjectionPath(entityClass, projection, fieldData[i], object, i);
 		}
 		
 		return object;
@@ -133,9 +117,18 @@ public class ApiResultMapper<E extends BaseEntity> {
 		Constructor<?> constructor = entityClass.getConstructor();
 		E object = (E) constructor.newInstance();
 		
-		if (projection != null &&projection.get(0) instanceof AggregationFunction) {
-			AggregationFunction aggregationFunction = (AggregationFunction) projection.get(0);
-			Path<Object> attributePath = (Path<Object>) aggregationFunction.getArgumentExpressions().get(0);
+		this.mapProjectionPath(entityClass, projection, row, object, 0);
+		
+		return object;
+	}
+
+	private void mapProjectionPath(Class<E> entityClass, List<Selection<? extends Object>>  projection, 
+			Object row, E object, int projectionIndex) throws ReflectiveOperationException {
+		
+		if (projection != null && projection.get(projectionIndex) instanceof SelfRenderingSqmAggregateFunction) {
+			
+			SelfRenderingSqmAggregateFunction aggregationFunction = (SelfRenderingSqmAggregateFunction) projection.get(projectionIndex);
+			SqmBasicValuedSimplePath<Object> attributePath = this.getAggregationPath(aggregationFunction);
 			
 			if (AggregateFunction.isCountFunction(aggregationFunction.getFunctionName()) ||
 					AggregateFunction.isCountDistinctFunction(aggregationFunction.getFunctionName())) {
@@ -149,11 +142,19 @@ public class ApiResultMapper<E extends BaseEntity> {
 			}
 			
 		} else if (projection != null) {
-			Path<Object> attributePath = (Path<Object>) projection.get(0);
+			Path<Object> attributePath = (Path<Object>) projection.get(projectionIndex);
 			this.mapProjectionField(entityClass, row, attributePath, object);
 		}
-		
-		return object;
+	}
+	
+	private SqmBasicValuedSimplePath<Object> getAggregationPath(SelfRenderingSqmAggregateFunction aggregationFunction) {
+		Object aggregationData = aggregationFunction.getArguments().get(0);
+
+		if (aggregationData instanceof SqmBasicValuedSimplePath) {
+			return (SqmBasicValuedSimplePath<Object>) aggregationData;
+		} 
+
+		return (SqmBasicValuedSimplePath<Object>) ((SqmDistinct<Object>) aggregationData).getExpression();
 	}
 
 	private void mapSumAggregationValues(Class<E> entityClass, Object row, E object, Path<Object> attributePath) {

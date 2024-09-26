@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.generic.rest.core.util.StringParserUtils;
 
-import io.micrometer.core.instrument.util.StringUtils;
+import io.micrometer.common.util.StringUtils;
 
 public class RequestFilter {
 	
@@ -382,7 +382,30 @@ public class RequestFilter {
 		}
 		this.countDistinct = countDistinct;
 	}
-
+	
+	public String getRawRequestFilter() {
+		StringBuilder rawFilter = new StringBuilder();
+		
+		rawFilter.append("filter=[").append(this.getRawValue(this.filter)).append("],");
+		rawFilter.append("projection=[").append(this.getRawValue(this.projection)).append("],");
+		rawFilter.append("sum=[").append(this.getRawValue(this.sum)).append("],");
+		rawFilter.append("avg=[").append(this.getRawValue(this.avg)).append("],");
+		rawFilter.append("count=[").append(this.getRawValue(this.count)).append("],");
+		rawFilter.append("countDistinct=[").append(this.getRawValue(this.countDistinct)).append("],");
+		rawFilter.append("groupBy=[").append(this.getRawValue(this.groupBy)).append("],");
+		rawFilter.append("sort=[").append(this.getRawValue(this.sort)).append("],");
+		rawFilter.append("offset=").append(this.getFetchOffset());
+		rawFilter.append("limit=").append(this.getFetchLimit());
+		
+		return rawFilter.toString();
+	}
+	
+	private String getRawValue(String value) {
+		if (StringUtils.isBlank(value)) {
+			return "";
+		}
+		return value;
+	}
 
 	@Override
 	public String toString() {

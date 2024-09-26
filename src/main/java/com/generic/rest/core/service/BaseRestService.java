@@ -1,19 +1,19 @@
 package com.generic.rest.core.service;
 
-import javax.persistence.EntityNotFoundException;
-
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.BaseRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 public abstract class BaseRestService<E extends BaseEntity, R extends BaseRepository<E>> 
 	extends ApiRestService<E, R> {
 	
 	public E findById(Long id) throws NotFoundApiException {
 		try {
-			return this.getRepository().getOne(id);
+			return this.getRepository().getReferenceById(id);
 			
 		} catch (EntityNotFoundException e) {
 			throw new NotFoundApiException(String.format(MSGERROR.BASE_ENTITY_NOT_FOUND_ERROR, id));

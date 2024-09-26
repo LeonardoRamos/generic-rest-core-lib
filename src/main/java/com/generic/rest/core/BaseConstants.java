@@ -74,7 +74,6 @@ public final class BaseConstants {
 		public static final String CLAIM_PRINCIPAL_CREDENTIAL = "email";
 		public static final String CLAIM_ADDITIONAL_INFO = "name";
 		public static final String CLAIM_CREDENTIAL_ROLE = "role";
-		public static final String CLAIM_EXTERNAL_ID = "userExternalId";
 		public static final String TOKEN = "token";
 		public static final String BEARER = "Bearer";
 		public static final String X_ACCESS_TOKEN = "x-access-token";

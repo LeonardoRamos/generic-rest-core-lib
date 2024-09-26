@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,20 +24,12 @@ import com.generic.rest.core.BaseConstants.JWTAUTH;
  *
  */
 @Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class WebSecurityConfig implements WebMvcConfigurer {
 	
 	@Autowired
 	private AuthorizationInterceptor authorizationInterceptor;
-	
+
 	/**
-	 * {@inheritDoc}
-	 */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().cors();
-    }
-	
-    /**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -43,6 +37,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
 		registry.addInterceptor(this.authorizationInterceptor)
 			.addPathPatterns(JWTAUTH.ALL_PATH_CORS_REGEX);
 	}
+	
+	/**
+	 * Create security filter chain for CSRF configuration.
+	 * @return Security filter chain.
+	 */
+	@Bean
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+             return http.csrf(AbstractHttpConfigurer::disable)
+            		 	.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        		 		.authorizeHttpRequests(auth -> auth
+		 				.requestMatchers(JWTAUTH.ALL_PATH_CORS_REGEX).permitAll()).build();
+    }
 	
 	/**
 	 * Create CORS configuration bean.

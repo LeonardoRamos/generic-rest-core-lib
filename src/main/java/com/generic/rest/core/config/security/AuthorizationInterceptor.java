@@ -1,8 +1,5 @@
 package com.generic.rest.core.config.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +11,9 @@ import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.UnauthorizedApiException;
 import com.generic.rest.core.service.TokenService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Implementation of {@link HandlerInterceptor} to process JWT Token authenticaton of all endpoints.
@@ -39,6 +39,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 			HandlerMethod handler = (HandlerMethod) objectHandler;
 			
 			NoSecurity noSecurity = handler.getMethodAnnotation(NoSecurity.class);
+			
 			if (noSecurity == null) {
 				
 				String token = this.tokenService.getTokenFromRequest(request);

@@ -1,15 +1,13 @@
 package com.generic.rest.core.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "address")
@@ -24,13 +22,11 @@ public class Address extends BaseApiEntity {
 	@Column(name = "state")
 	private String state;
 	
-	@OneToOne
-	@Cascade(CascadeType.SAVE_UPDATE)
+	@ManyToOne
 	@JoinColumn(name = "id_country")
 	private Country country;
 	
 	@OneToOne
-	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "id_user")
 	@JsonBackReference
 	private User user;

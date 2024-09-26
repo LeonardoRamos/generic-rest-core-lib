@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.generic.rest.core.BaseConstants;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 
-import io.micrometer.core.instrument.util.StringUtils;
+import io.micrometer.common.util.StringUtils;
 
 public class CalendarUtils {
 	

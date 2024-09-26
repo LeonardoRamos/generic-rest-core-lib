@@ -6,14 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
-
 import com.generic.rest.core.BaseConstants;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.filter.AggregateFunction;
@@ -25,6 +17,14 @@ import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.util.ReflectionUtils;
 import com.generic.rest.core.util.StringParserUtils;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 
 @SuppressWarnings({ "unchecked", "rawtypes" } )
 public class ApiQueryBuilder<E> {

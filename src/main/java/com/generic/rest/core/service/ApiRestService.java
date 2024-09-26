@@ -3,6 +3,7 @@ package com.generic.rest.core.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,10 @@ public abstract class ApiRestService<E extends BaseEntity, R extends BaseReposit
 		return new UUIDExternalIdGenerator();
 	}
 	
+	@Cacheable(
+			cacheNames = "apiEntities", 
+			key = "#requestFilter?.getRawRequestFilter()",
+			condition = "#requestFilter != null")
 	public ApiResponse<E> findAll(RequestFilter requestFilter) throws ApiException {
 		ApiResponse<E> response = new ApiResponse<>();
 		List<E> records = this.findAllRecords(requestFilter);
@@ -68,7 +73,7 @@ public abstract class ApiRestService<E extends BaseEntity, R extends BaseReposit
 	}
 	
    	public void deleteInBatch(List<E> entities) {
-   		this.getRepository().deleteInBatch(entities);
+   		this.getRepository().deleteAllInBatch(entities);
    	}
    	
    	public abstract E update(E entity) throws ApiException;

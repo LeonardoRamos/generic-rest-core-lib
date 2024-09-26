@@ -1,8 +1,8 @@
 package com.generic.rest.core.domain;
 
-import javax.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Transient;
 
 public interface AuthEntity {
 

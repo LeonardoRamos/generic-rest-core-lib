@@ -56,7 +56,7 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		return Collections.singletonMap(JWTAUTH.TOKEN, tokenService.generateToken(userAccount));
+		return Collections.singletonMap(JWTAUTH.TOKEN, this.tokenService.generateToken(userAccount));
 	}
 	
 	@Transactional
@@ -77,14 +77,14 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 	@Transactional
 	@Override
 	public User update(User user) throws ApiException {
-		User userDatabase = getByExternalId(user.getExternalId());
+		User userDatabase = this.getByExternalId(user.getExternalId());
 		
 		if (user.getId() == null) {
 			user.setId(userDatabase.getId());
 		}
 
 		userDatabase.setUpdateDate(Calendar.getInstance());
-      
+		
 		if (user.isActive()) {
 			user.setDeleteDate(null);
 		}
@@ -93,12 +93,12 @@ public class UserService extends BaseApiRestService<User, UserRepository> implem
 			user.setPassword(userDatabase.getPassword());
 		
 		} else if (!userDatabase.getPassword().equals(user.getPassword())) {
-			user.setPassword(passwordEncrypter.encryptPassword(user.getPassword()));
+			user.setPassword(this.passwordEncrypter.encryptPassword(user.getPassword()));
 		}
 		
-		setAddress(user);
+		this.setAddress(user);
 		
-		return userRepository.saveAndFlush(user);
+		return this.userRepository.saveAndFlush(user);
 	}
 	
 	private void setAddress(User user) {

@@ -2,12 +2,12 @@ package com.generic.rest.core.domain;
 
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 @JsonInclude(Include.NON_EMPTY)
