@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -49,6 +50,11 @@ public class ExceptionHandlerControllerAdvice {
 	@ExceptionHandler(ApiException.class)
 	public ResponseEntity<Map<String, Object>> apiException(ApiException exception) {
 		return this.handler(exception, this.errorParser.formatErrorList(exception), exception.getStatus());
+	}
+	
+	@ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+	public ResponseEntity<Map<String, Object>> forbidden(Exception exception) {
+		return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.AUTHENTICATION_FAILED_ERROR), HttpStatus.FORBIDDEN);
 	}
 	
 	@ExceptionHandler({Exception.class })

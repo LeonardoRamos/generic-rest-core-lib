@@ -117,6 +117,7 @@ public final class BaseConstants {
 		public static final String AUTH_ERROR_INVALID_TOKEN = "Invalid token [{}]";
 		public static final String AUTHORIZATION_TOKEN_NOT_VALID = "Authorization token not valid";
 		public static final String INTERNAL_ERROR = "Unexpected error";
+		public static final String AUTHENTICATION_FAILED_ERROR = "Authentication Failed";
 		public static final String MEDIA_TYPE_NOT_SUPPORTED = "Media type not supported";
 		public static final String METHOD_NOT_SUPPORTED = "Method not supported";
 		public static final String MEDIA_TYPE_NOT_ACCEPTABLE = "Media type not accepted";
