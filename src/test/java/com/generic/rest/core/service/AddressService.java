@@ -7,9 +7,10 @@ import com.generic.rest.core.domain.Address;
 import com.generic.rest.core.domain.Country;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.repository.AddressRepository;
+import com.generic.rest.core.service.impl.BaseApiRestServiceImpl;
 
 @Service
-public class AddressService extends BaseApiRestService<Address, AddressRepository> {
+public class AddressService extends BaseApiRestServiceImpl<Address, AddressRepository> {
 	
 	@Autowired
 	private AddressRepository addressRepository;

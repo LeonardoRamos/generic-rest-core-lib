@@ -1,4 +1,4 @@
-package com.generic.rest.core.service;
+package com.generic.rest.core.service.impl;
 
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.BaseEntity;
@@ -8,8 +8,8 @@ import com.generic.rest.core.repository.BaseRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
-public abstract class BaseRestService<E extends BaseEntity, R extends BaseRepository<E>> 
-	extends ApiRestService<E, R> {
+public abstract class BaseRestServiceImpl<E extends BaseEntity, R extends BaseRepository<E>> 
+	extends ApiRestServiceImpl<E, R> {
 	
 	public E findById(Long id) throws NotFoundApiException {
 		try {

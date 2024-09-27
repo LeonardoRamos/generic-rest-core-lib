@@ -18,10 +18,12 @@ import com.generic.rest.core.domain.User;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.UserRepository;
+import com.generic.rest.core.service.impl.BaseApiRestServiceImpl;
+import com.generic.rest.core.service.impl.TokenService;
 import com.generic.rest.core.util.encrypter.BCryptPasswordEncrypter;
 
 @Service
-public class UserService extends BaseApiRestService<User, UserRepository> implements AuthenticationService {
+public class UserService extends BaseApiRestServiceImpl<User, UserRepository> implements AuthenticationService {
 	
 	@Autowired
 	private UserRepository userRepository;

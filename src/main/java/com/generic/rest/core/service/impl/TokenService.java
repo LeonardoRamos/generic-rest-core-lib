@@ -1,4 +1,4 @@
-package com.generic.rest.core.service;
+package com.generic.rest.core.service.impl;
 
 import java.util.Base64;
 import java.util.Date;

@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.generic.rest.core.BaseConstants.CONTROLLER;
 import com.generic.rest.core.domain.BaseApiEntity;
 import com.generic.rest.core.exception.ApiException;
-import com.generic.rest.core.service.BaseApiRestService;
+import com.generic.rest.core.service.impl.BaseApiRestServiceImpl;
 
 @SuppressWarnings({ "rawtypes", "unchecked"} )
-public abstract class BaseApiRestController<E extends BaseApiEntity, S extends BaseApiRestService>
+public abstract class BaseApiRestController<E extends BaseApiEntity, S extends BaseApiRestServiceImpl>
 	extends ApiRestController<E, S> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseApiRestController.class);

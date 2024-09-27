@@ -1,4 +1,4 @@
-package com.generic.rest.core.service;
+package com.generic.rest.core.service.impl;
 
 import java.util.Calendar;
 
@@ -8,8 +8,8 @@ import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.BaseApiRepository;
 
-public abstract class BaseApiRestService<E extends BaseApiEntity, R extends BaseApiRepository<E>> 
-	extends ApiRestService<E, R>{
+public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends BaseApiRepository<E>> 
+	extends ApiRestServiceImpl<E, R>{
 	
 	public E getByExternalId(String externalId) throws NotFoundApiException {
 		E entity = this.getRepository().findOneByExternalId(externalId);

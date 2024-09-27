@@ -14,10 +14,10 @@ import com.generic.rest.core.domain.ApiResponse;
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.ApiException;
-import com.generic.rest.core.service.ApiRestService;
+import com.generic.rest.core.service.impl.ApiRestServiceImpl;
 
 @SuppressWarnings({ "rawtypes", "unchecked"} )
-public abstract class ApiRestController<E extends BaseEntity, S extends ApiRestService> {
+public abstract class ApiRestController<E extends BaseEntity, S extends ApiRestServiceImpl> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiRestController.class);
 	
