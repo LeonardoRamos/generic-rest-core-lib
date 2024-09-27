@@ -7,9 +7,15 @@ import com.generic.rest.core.domain.BaseApiEntity;
 import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.BaseApiRepository;
+import com.generic.rest.core.util.externalid.ExternalIdGenerator;
+import com.generic.rest.core.util.externalid.UUIDExternalIdGenerator;
 
 public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends BaseApiRepository<E>> 
 	extends ApiRestServiceImpl<E, R>{
+	
+	public ExternalIdGenerator getExternalIdGenerator() {
+		return new UUIDExternalIdGenerator();
+	}
 	
 	public E getByExternalId(String externalId) throws NotFoundApiException {
 		E entity = this.getRepository().findOneByExternalId(externalId);

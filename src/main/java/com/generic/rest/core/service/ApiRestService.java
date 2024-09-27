@@ -6,14 +6,8 @@ import com.generic.rest.core.domain.ApiResponse;
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.ApiException;
-import com.generic.rest.core.util.externalid.ExternalIdGenerator;
-import com.generic.rest.core.util.externalid.UUIDExternalIdGenerator;
 
 public interface ApiRestService<E extends BaseEntity> {
-	
-	default ExternalIdGenerator getExternalIdGenerator() {
-		return new UUIDExternalIdGenerator();
-	}
 	
 	ApiResponse<E> findAll(RequestFilter requestFilter) throws ApiException;
 	
