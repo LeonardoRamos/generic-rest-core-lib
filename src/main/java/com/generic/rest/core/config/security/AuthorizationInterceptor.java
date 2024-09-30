@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Implementation of {@link HandlerInterceptor} to process JWT Token authenticaton of all endpoints.
+ * 
  * @author leonardo.ramos
  *
  */

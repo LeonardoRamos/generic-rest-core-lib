@@ -20,6 +20,7 @@ import com.generic.rest.core.BaseConstants.JWTAUTH;
 
 /**
  * Adapter to configure CORS and intercecptors.
+ * 
  * @author leonardo.ramos
  *
  */
@@ -40,7 +41,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 	
 	/**
 	 * Create security filter chain for CSRF configuration.
-	 * @return Security filter chain.
+	 * 
+	 * @return {@link SecurityFilterChain}.
 	 */
 	@Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,7 +54,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 	
 	/**
 	 * Create CORS configuration bean.
-	 * @return CORS configuration bean.
+	 * 
+	 * @return {@link CorsConfigurationSource}.
 	 */
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {

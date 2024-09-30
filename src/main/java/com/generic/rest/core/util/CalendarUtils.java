@@ -14,14 +14,30 @@ import com.generic.rest.core.BaseConstants.MSGERROR;
 
 import io.micrometer.common.util.StringUtils;
 
+/**
+ * Utilitary class for {@link Calendar} operations.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 public class CalendarUtils {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarUtils.class);
+
+	/**
+	 * Default constructor
+	 */
 	private CalendarUtils() {
 		
 	}
 	
-	private static final Logger log = LoggerFactory.getLogger(CalendarUtils.class);
-	
+	/**
+	 * Create instance of {@link Calendar} with given format from parameter dateText.
+	 * 
+	 * @param dateText
+	 * @param dateFormat
+	 * @return {@link Calendar}
+	 */
 	public static Calendar createCalendarFromString(String dateText, String dateFormat) {
 		if (StringUtils.isBlank(dateText)) {
 			return null;
@@ -35,13 +51,19 @@ public class CalendarUtils {
 			calendar.setTime(simpleDateFormat.parse(dateText));
 		} 
 		catch (ParseException e) {
-			log.error(MSGERROR.ERROR_PARSE_DATE, dateText, e);
+			LOGGER.error(MSGERROR.ERROR_PARSE_DATE, dateText, e);
 			return null;
 		}
 		
 		return calendar;
 	}
 	
+	/**
+	 * Create instance of {@link Calendar} from miliseconds.
+	 * 
+	 * @param miliseconds
+	 * @return {@link Calendar}
+	 */
 	public static Calendar createCalendarFromMiliseconds(Long miliseconds) {
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(BaseConstants.DATE_TIMEZONE), 
 				Locale.of(BaseConstants.LOCALE_PT, BaseConstants.LOCALE_BR));

@@ -7,9 +7,19 @@ import org.springframework.context.annotation.Configuration;
 
 import com.generic.rest.core.BaseConstants.TOMCAT;
 
+/**
+ * Tomcat server customizer to allow special characters in embedded server for url request filter.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 @Configuration
 public class TomcatWebServerCustomizer {
 	
+	/**
+	 * Create bean of Server factory configuration for Tomcat embedded server.
+	 * @return {@link ConfigurableServletWebServerFactory}.
+	 */
 	@Bean
     public ConfigurableServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();

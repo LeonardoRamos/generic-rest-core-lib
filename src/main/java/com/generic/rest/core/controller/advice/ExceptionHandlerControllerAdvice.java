@@ -27,6 +27,12 @@ import com.generic.rest.core.exception.ApiException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Exception handler advice to handle exception and fomat error response.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 @RestControllerAdvice
 public class ExceptionHandlerControllerAdvice {
 	
@@ -34,34 +40,53 @@ public class ExceptionHandlerControllerAdvice {
 
 	private ErrorParser errorParser;
 	
+	/**
+	 * Default constructor.
+	 */
 	public ExceptionHandlerControllerAdvice() {
 		this.errorParser = new ErrorParser();
 	}
 	
-	private ResponseEntity<Map<String, Object>> handler(Exception exception, List<Map<String, String>> errors, HttpStatus status) {
-		if (status.is5xxServerError()) {
-			LOGGER.error(exception.getMessage(), exception);
-		} else {
-			LOGGER.warn(exception.getMessage(), exception);
-		}
-		return this.errorParser.createResponseEntity(errors, status);
-	}
-
+	/**
+	 * Handles {@link ApiException} request exception errors.
+	 * 
+	 * @param exception
+	 * @return {@link ResponseEntity}
+	 */
 	@ExceptionHandler(ApiException.class)
 	public ResponseEntity<Map<String, Object>> apiException(ApiException exception) {
 		return this.handler(exception, this.errorParser.formatErrorList(exception), exception.getStatus());
 	}
 	
+	/**
+	 * Handles forbidden request exception errors.
+	 * 
+	 * @param exception
+	 * @return {@link ResponseEntity}
+	 */
 	@ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
 	public ResponseEntity<Map<String, Object>> forbidden(Exception exception) {
 		return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.AUTHENTICATION_FAILED_ERROR), HttpStatus.FORBIDDEN);
 	}
 	
+	/**
+	 * Handles generic request exception errors.
+	 * 
+	 * @param exception
+	 * @return {@link ResponseEntity}
+	 */
 	@ExceptionHandler({Exception.class })
 	public ResponseEntity<Map<String, Object>> exception(Exception exception) {
 		return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.INTERNAL_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * Handles bad request exception errors.
+	 * 
+	 * @param req
+	 * @param exception
+	 * @return {@link ResponseEntity}
+	 */
 	@ExceptionHandler({
 		HttpRequestMethodNotSupportedException.class, 
 		HttpMediaTypeNotSupportedException.class, 
@@ -100,6 +125,14 @@ public class ExceptionHandlerControllerAdvice {
 		return handleFormatExceptions(exception, status);
 	}
 
+	/**
+	 * 
+	 * Handles different types of format errors of bad request nature.
+	 * 
+	 * @param exception
+	 * @param status
+	 * @return {@link ResponseEntity}
+	 */
 	private ResponseEntity<Map<String, Object>> handleFormatExceptions(Exception exception, HttpStatus status) {
 		if (exception instanceof HttpMessageNotReadableException) {
 
@@ -121,7 +154,30 @@ public class ExceptionHandlerControllerAdvice {
 
 		return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.BAD_REQUEST_ERROR), status);
 	}
-
+	
+	/**
+	 * Handler for creating and building formatted response.
+	 * 
+	 * @param exception
+	 * @param errors
+	 * @param status
+	 * @return {@link ResponseEntity}
+	 */
+	private ResponseEntity<Map<String, Object>> handler(Exception exception, List<Map<String, String>> errors, HttpStatus status) {
+		if (status.is5xxServerError()) {
+			LOGGER.error(exception.getMessage(), exception);
+		} else {
+			LOGGER.warn(exception.getMessage(), exception);
+		}
+		return this.errorParser.createResponseEntity(errors, status);
+	}
+	
+	/**
+	 * Build error path format.
+	 * 
+	 * @param exception
+	 * @return formatted error.
+	 */
 	private StringBuilder buildFormatErrorPath(Exception exception) {
 		InvalidFormatException ex = ((InvalidFormatException) exception.getCause());
 		StringBuilder path = new StringBuilder();

@@ -12,15 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.generic.rest.core.ApiConstants.CONTROLLER.LOGIN;
 import com.generic.rest.core.ApiConstants.MSGERROR;
+import com.generic.rest.core.BaseConstants;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.domain.Address;
 import com.generic.rest.core.domain.User;
 import com.generic.rest.core.exception.ApiException;
+import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.UserRepository;
 import com.generic.rest.core.service.impl.BaseApiRestServiceImpl;
 import com.generic.rest.core.service.impl.TokenService;
-import com.generic.rest.core.util.encrypter.BCryptPasswordEncrypter;
+import com.generic.rest.core.util.encrypter.impl.BCryptTextEncrypter;
 
 @Service
 public class UserService extends BaseApiRestServiceImpl<User, UserRepository> implements AuthenticationService {
@@ -34,7 +36,7 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 	@Autowired
 	private TokenService tokenService;
 	
-	private BCryptPasswordEncrypter passwordEncrypter = new BCryptPasswordEncrypter();
+	private BCryptTextEncrypter passwordEncrypter = new BCryptTextEncrypter();
 	
 	@Override
 	protected UserRepository getRepository() {
@@ -54,7 +56,7 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
-		if (!this.passwordEncrypter.matchPassword(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword())) {
+		if (!this.passwordEncrypter.matchText(credentials.get(LOGIN.PASSWORD_FIELD), userAccount.getPassword())) {
 			throw new AuthenticationCredentialsNotFoundException(MSGERROR.AUTHENTICATION_ERROR);
 		}
 		
@@ -64,7 +66,7 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 	@Transactional
 	@Override
 	public User save(User user) throws ApiException {
-		user.setPassword(this.passwordEncrypter.encryptPassword(user.getPassword()));
+		user.setPassword(this.passwordEncrypter.encryptText(user.getPassword()));
 		
 		this.setAddress(user);
 		
@@ -78,14 +80,19 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 	
 	@Transactional
 	@Override
-	public User update(User user) throws ApiException {
-		User userDatabase = this.getByExternalId(user.getExternalId());
+	public User update(String externalId, User user) throws ApiException {
+		
+		if (user.getExternalId() == null || externalId == null || !user.getExternalId().equals(externalId)) {
+			throw new BadRequestApiException(String.format(BaseConstants.MSGERROR.BAD_REQUEST_ERROR, externalId));
+		}
+		
+		User userDatabase = this.getByExternalId(externalId);
 		
 		if (user.getId() == null) {
 			user.setId(userDatabase.getId());
 		}
 
-		userDatabase.setUpdateDate(Calendar.getInstance());
+		user.setUpdateDate(Calendar.getInstance());
 		
 		if (user.isActive()) {
 			user.setDeleteDate(null);
@@ -95,7 +102,7 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 			user.setPassword(userDatabase.getPassword());
 		
 		} else if (!userDatabase.getPassword().equals(user.getPassword())) {
-			user.setPassword(this.passwordEncrypter.encryptPassword(user.getPassword()));
+			user.setPassword(this.passwordEncrypter.encryptText(user.getPassword()));
 		}
 		
 		this.setAddress(user);

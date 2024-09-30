@@ -208,15 +208,19 @@ public class ApiQueryBuilder<E> {
 		
 		switch (filterField.getFilterOperator()) {
 			case IN:
-				field = getSignificantField(fields);
+				field = this.getSignificantField(fields);
+				
+				String normalizedValues = StringParserUtils.replace(filterField.getValue(), new String[]{"(", ")"}, "");
+				
 				return this.getFieldExpressionPath(fields, root)
-						.in(ReflectionUtils.getFieldList(
-								StringParserUtils.replace(StringParserUtils.replace(filterField.getValue(), "(", ""), ")", ""),
-								field.getType()));
+						.in(ReflectionUtils.getTypifiedValue(StringParserUtils.splitStringList(normalizedValues, ','), field.getType()));
 			case OU:
-				field = getSignificantField(fields);
+				field = this.getSignificantField(fields);
+				
+				normalizedValues = StringParserUtils.replace(filterField.getValue(), new String[]{"(", ")"}, "");
+				
 				return this.getFieldExpressionPath(fields, root)
-						.in(ReflectionUtils.getFieldList(filterField.getValue(), field.getType())).not();
+						.in(ReflectionUtils.getTypifiedValue(StringParserUtils.splitStringList(normalizedValues, ','), field.getType())).not();
 			case GE:
 				return criteriaBuilder.greaterThanOrEqualTo(this.getFieldExpressionPath(
 						fields, root), (Comparable) this.getTypifiedValue(filterField, fields));
@@ -266,7 +270,7 @@ public class ApiQueryBuilder<E> {
 			throws IOException, NoSuchFieldException {
 		
 		Field field = this.getSignificantField(fields);
-		return ReflectionUtils.getEntityValueParsed(filterField.getValue(), field.getType());
+		return ReflectionUtils.getTypifiedValue(filterField.getValue(), field.getType());
 	}
 
 	private Field getSignificantField(List<Field> fields) throws NoSuchFieldException {

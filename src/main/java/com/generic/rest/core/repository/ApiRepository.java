@@ -24,6 +24,13 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Selection;
 
+/**
+ * API based methods for CRUD operations in generic entities that extends {@link BaseEntity}.
+ * 
+ * @author leonardo.ramos
+ *
+ * @param <E>
+ */
 @Repository
 public class ApiRepository<E extends BaseEntity> {
 	
@@ -31,6 +38,11 @@ public class ApiRepository<E extends BaseEntity> {
 	private ApiQueryBuilder<E> apiQueryBuilder;
 	private ApiResultMapper<E> apiResultMapper;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param entityManager
+	 */
 	@Autowired
 	public ApiRepository(EntityManager entityManager) {
 		this.entityManager = entityManager;
@@ -39,6 +51,16 @@ public class ApiRepository<E extends BaseEntity> {
 		this.apiResultMapper = new ApiResultMapper<>();
 	}
 	
+	/**
+	 * Count total of entities based on given {@link requestFilter}.
+	 * 
+	 * @param entityClass
+	 * @param requestFilter
+	 * @return total of records
+	 * @throws NotFoundApiException
+	 * @throws BadRequestApiException
+	 * @throws InternalErrorApiException
+	 */
 	public Long countAll(Class<E> entityClass, RequestFilter requestFilter) 
 			throws NotFoundApiException, BadRequestApiException, InternalErrorApiException {
 		
@@ -68,6 +90,16 @@ public class ApiRepository<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * * Search entities based on given {@link requestFilter}.
+	 * 
+	 * @param entityClass
+	 * @param requestFilter
+	 * @return records of given search
+	 * @throws NotFoundApiException
+	 * @throws BadRequestApiException
+	 * @throws InternalErrorApiException
+	 */
 	public List<E> findAll(Class<E> entityClass, RequestFilter requestFilter) 
 			throws NotFoundApiException, BadRequestApiException, InternalErrorApiException {
 		
@@ -118,6 +150,16 @@ public class ApiRepository<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * Perform SQL aggregation of entities based on given {@link requestFilter}.
+	 * 
+	 * @param entityClass
+	 * @param requestFilter
+	 * @return aggregated records
+	 * @throws NotFoundApiException
+	 * @throws BadRequestApiException
+	 * @throws InternalErrorApiException
+	 */
 	public List<E> aggregate(Class<E> entityClass, RequestFilter requestFilter) 
 			throws NotFoundApiException, BadRequestApiException, InternalErrorApiException {
 		

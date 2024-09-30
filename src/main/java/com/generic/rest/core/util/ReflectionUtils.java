@@ -11,54 +11,51 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.generic.rest.core.BaseConstants;
 
+/**
+ * 
+ * 
+ * @author leonardo.ramos
+ *
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ReflectionUtils {
 	
 	private static ObjectMapper mapper = new ObjectMapper();
 
+	/**
+	 * Default constructor.
+	 */
 	private ReflectionUtils() {
 		
 	}
 	
-	public static List<Object> getFieldList(String value, Class<?> clazz) throws IOException {
-		List<Object> values = new ArrayList<>();
-		StringBuilder word = new StringBuilder();
+	/**
+	 * Retrieve list of field values parsed as a given Class type.
+	 * 
+	 * @param values
+	 * @param clazz
+	 * @return list of fields
+	 * @throws IOException
+	 */
+	public static List<Object> getTypifiedValue(List<String> values, Class<?> clazz) throws IOException {
+		List<Object> typifiedValues = new ArrayList<>();
 		
-		for (int i = 0; i < value.length(); i++) {
-			if (value.charAt(i) == ',') {
-				values.add(getEntityValueParsed(word.toString().trim(), clazz));
-				word = new StringBuilder();
-			} else {
-				word.append(value.charAt(i));
-			}
+		for (String value : values) {
+			typifiedValues.add(getTypifiedValue(value, clazz));
 		}
 		
-		values.add(getEntityValueParsed(word.toString().trim(), clazz));
-		
-		return values;
+		return typifiedValues;
 	}
 	
-	public static Field getEntityFieldByName(Class<?> clazz, String fieldName) throws NoSuchFieldException, SecurityException {
-		try {
-			return clazz.getDeclaredField(fieldName);
-		
-		} catch (NoSuchFieldException e) {
-			Class<?> superClazz = clazz.getSuperclass();
-			
-			while (superClazz != null) {
-				try {
-					return superClazz.getDeclaredField(fieldName);
-				
-				} catch (NoSuchFieldException ex) {
-					superClazz = superClazz.getSuperclass();
-				}
-			}
-			
-			throw new NoSuchFieldException(e.getMessage());
-		}
-	}
-	
-	public static Object getEntityValueParsed(String value, Class<?> clazz) throws IOException {
+	/**
+	 * Parse String value for specific class parsed value.
+	 * 
+	 * @param value
+	 * @param clazz
+	 * @return field data value
+	 * @throws IOException
+	 */
+	public static Object getTypifiedValue(String value, Class<?> clazz) throws IOException {
 		if (value != null && !"".equals(value)) {
 			if (clazz.equals(Long.class)) {
 				return Double.valueOf(value).longValue();
@@ -94,7 +91,43 @@ public class ReflectionUtils {
 		
 		return value;
 	}
-
+	
+	/**
+	 * Retrieve {@link Field} with fiven fieldName.
+	 * 
+	 * @param clazz
+	 * @param fieldName
+	 * @return field name
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 */
+	public static Field getEntityFieldByName(Class<?> clazz, String fieldName) throws NoSuchFieldException, SecurityException {
+		try {
+			return clazz.getDeclaredField(fieldName);
+		
+		} catch (NoSuchFieldException e) {
+			Class<?> superClazz = clazz.getSuperclass();
+			
+			while (superClazz != null) {
+				try {
+					return superClazz.getDeclaredField(fieldName);
+				
+				} catch (NoSuchFieldException ex) {
+					superClazz = superClazz.getSuperclass();
+				}
+			}
+			
+			throw new NoSuchFieldException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Parse value of type {@link Enum}.
+	 * 
+	 * @param value
+	 * @param clazz
+	 * @return Field value for {@link Enum} type
+	 */
 	private static Object getEnumFieldValue(String value, Class<?> clazz) {
 		try {
 			return Enum.valueOf((Class<? extends Enum>) clazz, value);
@@ -103,6 +136,12 @@ public class ReflectionUtils {
 		}
 	}
 
+	/**
+	 * Parse value of type {@link Calendar}.
+	 * 
+	 * @param value
+	 * @return {@link Calendar} value for data value
+	 */
 	private static Object getCalendarFieldValue(String value) {
 		if (StringParserUtils.isNumeric(value)) {
 			return CalendarUtils.createCalendarFromMiliseconds(Double.valueOf(value).longValue());

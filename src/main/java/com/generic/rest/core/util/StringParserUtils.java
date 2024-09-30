@@ -3,12 +3,28 @@ package com.generic.rest.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utilitary class for custom String operations without the use of any time consuming REGEXP.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 public class StringParserUtils {
 	
+	/**
+	 * Default constructor.
+	 */
 	private StringParserUtils() {
 		
 	}
 	
+	/**
+	 * Split string with given character delimiter.
+	 * 
+	 * @param value
+	 * @param delimiter
+	 * @return splitted string
+	 */
 	public static List<String> splitStringList(String value, char delimiter) {
 		List<String> values = new ArrayList<>();
 		
@@ -31,6 +47,14 @@ public class StringParserUtils {
 		return values;
 	}
 	
+	/**
+	 * Replace a fragment of a string with a given ne fragment.
+	 * 
+	 * @param source
+	 * @param originalString
+	 * @param newString
+	 * @return string with repaced value
+	 */
 	public static String replace(String source, String originalString, String newString) {
 	    if (source == null) {
 	        return null;
@@ -61,6 +85,33 @@ public class StringParserUtils {
 	    return source;
 	}
 
+	/**
+	 * Replace fragments of a string with a given ne fragment.
+	 * 
+	 * @param source
+	 * @param originalString
+	 * @param newString
+	 * @return string with repaced values
+	 */
+	public static String replace(String source, String[] originalStrings, String newString) {
+	    if (source == null) {
+	        return null;
+	    }
+	    
+	    for (int k = 0; k < originalStrings.length; k++) {
+	    	source = replace(source, originalStrings[k], newString); 
+	    }
+	    
+	    return source;
+	}
+
+	
+	/**
+	 * Verify if a given String is numeric.
+	 * 
+	 * @param value
+	 * @return true if string is numeric, false otherwise.
+	 */
 	public static boolean isNumeric(String value) {
 		for (char ch : value.toCharArray()) {
 			if (!Character.isDigit(ch)) {

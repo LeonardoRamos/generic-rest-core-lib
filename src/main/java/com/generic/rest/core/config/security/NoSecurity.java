@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to bypass token required security.
+ * 
  * @author leonardo.ramos
  *
  */

@@ -16,6 +16,7 @@ import com.generic.rest.core.BaseConstants.HEALTHCHECK;
 
 /**
  * Custom health indicator to check DataSource status.
+ * 
  * @author leonardo.ramos
  *
  */
@@ -33,6 +34,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Constructor
+	 * 
 	 * @param dataSource
 	 */
 	public DatabaseHealthIndicator(DataSource dataSource) {
@@ -66,6 +68,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Check health of dataSource.
+	 * 
 	 * @param builder
 	 */
 	private void doDataSourceHealthCheck(Health.Builder builder) {
@@ -75,6 +78,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Get Database product identifier name through database template.
+	 * 
 	 * @return product name
 	 */
 	private String getProduct() {
@@ -83,6 +87,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Get Database product identifier name from connection.
+	 * 
 	 * @param connection
 	 * @return product name
 	 * @throws SQLException
@@ -101,6 +106,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Get connection status from database connection.
+	 * 
 	 * @param connection
 	 * @return connection status
 	 * @throws SQLException
@@ -111,6 +117,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 
 	/**
 	 * Set dataSource.
+	 * 
 	 * @param dataSource
 	 */
 	public void setDataSource(DataSource dataSource) {
