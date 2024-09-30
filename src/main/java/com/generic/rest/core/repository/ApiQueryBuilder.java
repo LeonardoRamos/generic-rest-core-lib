@@ -11,6 +11,7 @@ import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.filter.AggregateFunction;
 import com.generic.rest.core.domain.filter.FilterExpression;
 import com.generic.rest.core.domain.filter.FilterField;
+import com.generic.rest.core.domain.filter.FilterOperator;
 import com.generic.rest.core.domain.filter.FilterOrder;
 import com.generic.rest.core.domain.filter.LogicOperator;
 import com.generic.rest.core.domain.filter.RequestFilter;
@@ -26,9 +27,22 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Selection;
 
+/**
+ * Class responsible for building JPA query related filters.
+ * 
+ * @author leonardo.ramos
+ *
+ * @param <E>
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" } )
 public class ApiQueryBuilder<E> {
 	
+	/**
+	 * Verify if given projection has any collection / multi valued field.
+	 * 
+	 * @param projection
+	 * @return true if selection has multi valued / collection projection, false otherwise.
+	 */
 	public boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
 			return false;
@@ -45,6 +59,15 @@ public class ApiQueryBuilder<E> {
 		return false;
 	}
 	
+	/**
+	 * Build group by fields selection from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param root
+	 * @param entityClass
+	 * @return Selection of group by fields
+	 * @throws BadRequestApiException
+	 */
 	public List<Selection<? extends Object>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
@@ -55,6 +78,15 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 	
+	/**
+	 * Build projection fields selection from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param root
+	 * @param entityClass
+	 * @return Selection of projection fields
+	 * @throws BadRequestApiException
+	 */
 	public List<Selection<? extends Object>> getProjectionFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> projectionFields = StringParserUtils.splitStringList(requestFilter.getProjection(), ',');
@@ -65,6 +97,15 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 	
+	/**
+	 * Build list of selection of a given projection by its real classes types.
+	 * 
+	 * @param root
+	 * @param entityClass
+	 * @param projectionFields
+	 * @return Selection of group by fields
+	 * @throws NoSuchFieldException
+	 */
 	private List<Selection<? extends Object>> buildProjectionSelection(Root<?> root, Class<E> entityClass,
 			List<String> projectionFields) throws NoSuchFieldException {
 		
@@ -81,6 +122,16 @@ public class ApiQueryBuilder<E> {
 		return projection;
 	}
 	
+	/**
+	 * Build aggregation fields selection from {@link RequestFilter}.
+	 * 
+	 * @param root
+	 * @param criteriaBuilder
+	 * @param entityClass
+	 * @param requestFilter
+	 * @return Selection of aggregation fields
+	 * @throws BadRequestApiException
+	 */
 	public List<Selection<? extends Object>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			RequestFilter requestFilter) throws BadRequestApiException {
 		try {
@@ -119,6 +170,17 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Add aggregation filter path to an existing JPA {@link CriteriaBuilder}.
+	 * 
+	 * @param root
+	 * @param criteriaBuilder
+	 * @param entityClass
+	 * @param requestFields
+	 * @param aggregationFields
+	 * @param aggregateFunction
+	 * @throws NoSuchFieldException
+	 */
 	private void addAggregationFields(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			List<String> requestFields, List<Selection<? extends Object>> aggregationFields, String aggregateFunction) throws NoSuchFieldException {
 		
@@ -143,6 +205,16 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Build a list of {@link Predicate} according to a query filter of a given {@link RequestFilter}.
+	 * 
+	 * @param entityClass
+	 * @param requestFilter
+	 * @param criteriaBuilder
+	 * @param root
+	 * @return List of {@link Predicate}
+	 * @throws BadRequestApiException
+	 */
 	public List<Predicate> getRestrictions(
 			Class<E> entityClass,
 			RequestFilter requestFilter, 
@@ -181,6 +253,20 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Fill the {@link Predicate} with the restrictions and the query related to the 
+	 * {@link FilterExpression} of {@link LogicOperator#OR} operator and return the next nested 
+	 * expression after the {@link LogicOperator#OR} expression.
+	 * 
+	 * @param entityClass
+	 * @param criteriaBuilder
+	 * @param root
+	 * @param currentExpression
+	 * @param conjunctionRestrictions
+	 * @return {@link FilterExpression}
+	 * @throws NoSuchFieldException
+	 * @throws IOException
+	 */
 	private FilterExpression getOrRestrictions(Class<E> entityClass, CriteriaBuilder criteriaBuilder, Root<?> root,
 			FilterExpression currentExpression, List<Predicate> conjunctionRestrictions)
 			throws NoSuchFieldException, IOException {
@@ -188,6 +274,7 @@ public class ApiQueryBuilder<E> {
 		do {
 			conjunctionRestrictions.add(this.buildPredicate(entityClass, currentExpression.getFilterField(), criteriaBuilder, root));
 			currentExpression = currentExpression.getFilterNestedExpression();
+		
 		} while (currentExpression != null && LogicOperator.OR.equals(currentExpression.getLogicOperator()));
 		
 		if (currentExpression != null && currentExpression.getFilterField() != null) {
@@ -197,6 +284,17 @@ public class ApiQueryBuilder<E> {
 		return currentExpression;
 	}
 
+	/**
+	 * Build query {@link Predicate} based on {@link FilterField} field, expected value and a {@link FilterOperator}.
+	 * 
+	 * @param entityClass
+	 * @param filterField
+	 * @param criteriaBuilder
+	 * @param root
+	 * @return Predicate
+	 * @throws NoSuchFieldException
+	 * @throws IOException
+	 */
 	private Predicate buildPredicate(
 			Class<E> entityClass,
 			FilterField filterField, 
@@ -252,6 +350,15 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Split a field into a chained list of its subfields.
+	 * 
+	 * @param entityClass
+	 * @param fieldName
+	 * @return List of {@link Field}
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 */
 	private List<Field> splitFields(Class<E> entityClass, String fieldName) throws NoSuchFieldException, SecurityException {
 		List<Field> fields = new ArrayList<>();
 		List<String> attributeNames =  StringParserUtils.splitStringList(fieldName, '.');
@@ -266,6 +373,15 @@ public class ApiQueryBuilder<E> {
 		return fields;
 	}
 
+	/**
+	 * Return the typified value of a leaf last subfield.
+	 * 
+	 * @param filterField
+	 * @param fields
+	 * @return The value of the field
+	 * @throws IOException
+	 * @throws NoSuchFieldException
+	 */
 	private Object getTypifiedValue(FilterField filterField, List<Field> fields)
 			throws IOException, NoSuchFieldException {
 		
@@ -273,6 +389,13 @@ public class ApiQueryBuilder<E> {
 		return ReflectionUtils.getTypifiedValue(filterField.getValue(), field.getType());
 	}
 
+	/**
+	 * Return leaf last subfield
+	 * 
+	 * @param fields
+	 * @return {@link Field}
+	 * @throws NoSuchFieldException
+	 */
 	private Field getSignificantField(List<Field> fields) throws NoSuchFieldException {
 		if (fields.isEmpty()) {
 			throw new NoSuchFieldException();
@@ -281,6 +404,14 @@ public class ApiQueryBuilder<E> {
 		return fields.get(fields.size() - 1);
 	}
 	
+	/**
+	 * Build {@link Expression} of {@link Path} for given fields.
+	 * 
+	 * @param fields
+	 * @param root
+	 * @return {@link Expression}
+	 * @throws NoSuchFieldException
+	 */
 	private Expression getFieldExpressionPath(List<Field> fields, Root<?> root) throws NoSuchFieldException {
 		Path<E> expressionPath = null;
 		
@@ -301,6 +432,16 @@ public class ApiQueryBuilder<E> {
 		return expressionPath;
 	}
 	
+	/**
+	 * Build a list of {@link Order} from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param criteriaBuilder
+	 * @param root
+	 * @param entityClass
+	 * @return List of {@link Order}
+	 * @throws BadRequestApiException
+	 */
 	public List<Order> getOrders(
 			RequestFilter requestFilter, 
 			CriteriaBuilder criteriaBuilder,

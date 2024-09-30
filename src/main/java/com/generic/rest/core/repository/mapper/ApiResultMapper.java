@@ -25,9 +25,25 @@ import com.generic.rest.core.util.ReflectionUtils;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Selection;
 
+/**
+ * Mapper class responsible for creating the response query entities from the JPA query result.
+ * 
+ * @author leonardo.ramos
+ *
+ * @param <E>
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ApiResultMapper<E extends BaseEntity> {
 	
+	/**
+	 * Map result from JPA query.
+	 * 
+	 * @param entityClass
+	 * @param result
+	 * @param projection
+	 * @return List of mapped entities
+	 * @throws ReflectiveOperationException
+	 */
 	public List<E> mapResultSet(
 			Class<E> entityClass, 
 			List<Object> result, 
@@ -53,6 +69,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return entities;
 	}
 	
+	/**
+	 * Map result simple values into an Object of the result type entity.
+	 * 
+	 * @param entityClass
+	 * @param projection
+	 * @param row
+	 * @return entity
+	 * @throws ReflectiveOperationException
+	 */
 	private E mapSimpleValuesSelection(
 			Class<E> entityClass, 
 			List<Selection<? extends Object>> projection, 
@@ -70,6 +95,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return object;
 	}
 
+	/**
+	 * Map a result Object row and its projections into a type entity in case of results of same type as <E>.
+	 * 
+	 * @param entityClass
+	 * @param projection
+	 * @param row
+	 * @return entity
+	 * @throws ReflectiveOperationException
+	 */
 	private E mapEntityObject(
 			Class<E> entityClass, 
 			List<Selection<? extends Object>> projection,
@@ -95,6 +129,13 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return object;
 	}
 	
+	/**
+	 * Verify if fieldName is list of {@link Selection} projection.
+	 * 
+	 * @param fieldName
+	 * @param projection
+	 * @return true if fieldName is in projection false otherwise
+	 */
 	private boolean isInProjection(String fieldName, List<Selection<? extends Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
 			return false;
@@ -109,6 +150,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return false;
 	}
 
+	/**
+	 * Map a result Object row of values and its projections into a type entity in case of aggregations.
+	 * 
+	 * @param entityClass
+	 * @param projection
+	 * @param row
+	 * @return entity
+	 * @throws ReflectiveOperationException
+	 */
 	private E mapEntityValues(
 			Class<E> entityClass, 
 			List<Selection<? extends Object>> projection,
@@ -122,6 +172,16 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return object;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param entityClass
+	 * @param projection
+	 * @param row
+	 * @param object
+	 * @param projectionIndex
+	 * @throws ReflectiveOperationException
+	 */
 	private void mapProjectionPath(Class<E> entityClass, List<Selection<? extends Object>>  projection, 
 			Object row, E object, int projectionIndex) throws ReflectiveOperationException {
 		
@@ -147,6 +207,13 @@ public class ApiResultMapper<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * Return the respective path {@link SqmBasicValuedSimplePath} for a given aggregation. </p>
+	 * JPA returns different data structure for count distinct results.
+	 * 
+	 * @param aggregationFunction
+	 * @return {@link SqmBasicValuedSimplePath}
+	 */
 	private SqmBasicValuedSimplePath<Object> getAggregationPath(SelfRenderingSqmAggregateFunction aggregationFunction) {
 		Object aggregationData = aggregationFunction.getArguments().get(0);
 
@@ -157,6 +224,14 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return (SqmBasicValuedSimplePath<Object>) ((SqmDistinct<Object>) aggregationData).getExpression();
 	}
 
+	/**
+	 * Map sum aggregation values.
+	 * 
+	 * @param entityClass
+	 * @param row
+	 * @param object
+	 * @param attributePath
+	 */
 	private void mapSumAggregationValues(Class<E> entityClass, Object row, E object, Path<Object> attributePath) {
 		if (row.getClass().equals(Double.class)) {
 			object.addSum(this.mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
@@ -165,6 +240,14 @@ public class ApiResultMapper<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * Map avg aggregation values.
+	 * 
+	 * @param entityClass
+	 * @param row
+	 * @param object
+	 * @param attributePath
+	 */
 	private void mapAvgAggregationValues(Class<E> entityClass, Object row, E object, Path<Object> attributePath) {
 		if (row.getClass().equals(Double.class)) {
 			object.addAvg(this.mapAggregationField(entityClass, BigDecimal.valueOf((Double) row), attributePath));
@@ -173,6 +256,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * Map projection field in case of a query aggregation.
+	 * 
+	 * @param entityClass
+	 * @param fieldData
+	 * @param attributePath
+	 * @param entity
+	 * @throws ReflectiveOperationException
+	 */
 	private void mapProjectionField(Class<E> entityClass, Object fieldData, Path<Object> attributePath, E entity) 
 			throws ReflectiveOperationException {
 		
@@ -211,6 +303,14 @@ public class ApiResultMapper<E extends BaseEntity> {
 		}
 	}
 	
+	/**
+	 * Set nested field value for class and subclass.
+	 * 
+	 * @param rootFieldData
+	 * @param entity
+	 * @param fieldPaths
+	 * @throws ReflectiveOperationException
+	 */
 	private void setProjectionNestedField(Object rootFieldData, Object entity, List<Map<String, Class>> fieldPaths) 
 			throws ReflectiveOperationException {
 		
@@ -244,6 +344,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		}
 	}
 
+	/**
+	 * Map adn set the last nested projection of a subfield.
+	 * 
+	 * @param clazz
+	 * @param fieldData
+	 * @param object
+	 * @param fieldEntry
+	 * @throws ReflectiveOperationException
+	 */
 	private void setLastProjectionNestedField(Class clazz, Object fieldData, Object object, Map.Entry<String, Class> fieldEntry) 
 			throws ReflectiveOperationException {
 		
@@ -252,6 +361,13 @@ public class ApiResultMapper<E extends BaseEntity> {
 		this.setFieldValue(fieldData, object, fieldRoot);
 	}
 
+	/**
+	 * Build all nested fields from a given {@link Path}.
+	 * 
+	 * @param entityClass
+	 * @param attributePath
+	 * @return List of Map that represents a field name and value
+	 */
 	private List<Map<String, Class>> buildNestedFields(Class<E> entityClass, Path<Object> attributePath) {
 		List<Map<String, Class>> fieldPaths = new ArrayList<>();
 		
@@ -267,6 +383,14 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return fieldPaths;
 	}
 	
+	/**
+	 * Build a map that represents an aggregation field and value from given {@link Path}.
+	 * 
+	 * @param entityClass
+	 * @param fieldData
+	 * @param attributePath
+	 * @return Map that represents an aggregation field and value.
+	 */
 	private Map<String, Object> mapAggregationField(Class<E> entityClass, Object fieldData, Path<Object> attributePath) {
 		Map<String, Object> aggregation = new HashMap<>();
 		
@@ -285,6 +409,15 @@ public class ApiResultMapper<E extends BaseEntity> {
 		return aggregation;
 	}
 
+	/**
+	 * Set a field value in the target entity object.
+	 * 
+	 * @param fieldDataValue
+	 * @param object
+	 * @param field
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
 	private void setFieldValue(Object fieldDataValue, Object object, Field field) 
 			throws IllegalArgumentException, IllegalAccessException {
 		

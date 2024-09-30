@@ -239,6 +239,48 @@ class BaseApiRestControllerTest {
            	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
            	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
 	}
+	
+	@Test
+	void getAllUsers_OkSortAsc() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name=asc]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
+	
+	@Test
+	void getAllUsers_OkSortDesc() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name=desc]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
+	
+	@Test
+	void getAllUsers_OkSortDefault() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
      
 	@Test
 	void getAllUsersSingleProjection_Ok() throws Exception {

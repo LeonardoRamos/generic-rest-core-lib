@@ -53,7 +53,8 @@ public class FilterOrder {
 	}
 	
 	/**
-	 * Parse parameter sort of class {@link RequestFilter} and return a list of parsed {@link FilterOrder}.
+	 * Parse parameter sort of class {@link RequestFilter} and return a list of parsed {@link FilterOrder}. </p>
+	 * Default sorting order is {@link SortOrder#ASC}.
 	 * 
 	 * @param sort
 	 * @return List of {@link FilterOrder}
