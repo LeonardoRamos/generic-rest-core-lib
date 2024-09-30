@@ -11,7 +11,7 @@ Import the dependency on your project. POC example https://github.com/LeonardoRa
 <dependency>
    <groupId>com.generic.rest.core</groupId>
    <artifactId>generic-rest-core-lib</artifactId>
-   <version>1.0.0</version>
+   <version>1.1.0</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@ public interface CarRepository extends BaseRepository<Car> {
 
 ```java
 @Service
-public class CarService extends BaseRestService<Car, CarRepository> {
+public class CarService extends BaseRestServiceImpl<Car, CarRepository> {
 	
 	@Autowired
 	private CarRepository carRepository;
@@ -104,7 +104,7 @@ public interface ExperimentRepository extends BaseApiRepository<Experiment> {
 
 ```java
 @Service
-public class ExperimentService extends BaseApiRestService<Experiment, ExperimentRepository> {
+public class ExperimentService extends BaseApiRestServiceImpl<Experiment, ExperimentRepository> {
 	
 	@Autowired
 	private ExperimentRepository experimentRepository;
@@ -157,7 +157,7 @@ public class User extends BaseApiEntity implements AuthEntity {
 
 ```java
 @Service
-public class ExperimentService extends BaseApiRestService<Experiment, ExperimentRepository> {
+public class ExperimentService extends BaseApiRestServiceImpl<Experiment, ExperimentRepository> {
 	
 	@Autowired
 	private ExperimentRepository experimentRepository;
