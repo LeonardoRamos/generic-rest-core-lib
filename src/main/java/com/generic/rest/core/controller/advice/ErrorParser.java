@@ -20,20 +20,39 @@ import com.generic.rest.core.BaseConstants.ERRORKEYS;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.ApiException;
 
+/**
+ * Parser class to format and create API error responses based on exception message.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 public class ErrorParser {
 	
-	private static Logger log = LoggerFactory.getLogger(ErrorParser.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ErrorParser.class);
 
+	/**
+	 * Create {@link ResponseEntity} with list of error and status of given error.
+	 * 
+	 * @param errors
+	 * @param status
+	 * @return {@link ResponseEntity}
+	 */
 	public ResponseEntity<Map<String, Object>> createResponseEntity(List<Map<String, String>> errors, HttpStatus status) {
 		return new ResponseEntity<>(Collections.singletonMap(ERRORKEYS.KEY, errors), status);
 	}
 	
+	/**
+	 * Format binding errors from entity validation.
+	 * 
+	 * @param bindingResult
+	 * @return formatted list of errors.
+	 */
 	public List<Map<String, String>> formatErrorList(BindingResult bindingResult) {
 		List<Map<String, String>> errors = new ArrayList<>();
 
 		if (bindingResult != null) {
 			String message = BaseConstants.MSGERROR.VALIDATION_ERROR;
-			String code = getErrorCode(message);
+			String code = this.getErrorCode(message);
 					
 			for (ObjectError objectError: bindingResult.getAllErrors()) {
 				if (objectError.getDefaultMessage() != null) {
@@ -58,27 +77,53 @@ public class ErrorParser {
 		return errors;
 	}
 	
+	/**
+	 * Format erros from {@link ApiException} error messages.
+	 * 
+	 * @param exception
+	 * @return formatted list of errors.
+	 */
 	public List<Map<String, String>> formatErrorList(ApiException exception) {
-    	return formatErrorList(exception.getCode(), exception.getData());
+    	return this.formatErrorList(exception.getCode(), exception.getData());
 	}
 	
+	/**
+	 * Format error message from exception message text.
+	 * 
+	 * @param message
+	 * @return formatted list of errors.
+	 */
 	public List<Map<String, String>> formatErrorList(String message) {
 		Object [] data = null;
-		return formatErrorList(message, data);
+		return this.formatErrorList(message, data);
 	}
 	
+	/**
+	 * Format error message with given list of error data.
+	 * 
+	 * @param message
+	 * @param data
+	 * @return formatted list of errors.
+	 */
 	public List<Map<String, String>> formatErrorList(String message, Object... data) {
 		List<Map<String, String>> errors = new ArrayList<>();
     	
-    	errors.add(createError(message, data));
+    	errors.add(this.createError(message, data));
 		
     	return errors;
 	}
 	
+	/**
+	 * Create error map of errors with given list of data. 
+	 * 
+	 * @param message
+	 * @param data
+	 * @return formatted list of errors.
+	 */
 	private Map<String, String> createError(String message, Object... data) {
 		Map<String, String> error = new HashMap<>();
     	
-		String code = getErrorCode(message);
+		String code = this.getErrorCode(message);
 
 		if (data != null && data.length > 0) {
 			StringBuilder dataMessage = new StringBuilder(message).append(" [");
@@ -100,23 +145,24 @@ public class ErrorParser {
     	return error;
 	}
 	
+	/**
+	 * Get respective error code for the error message.
+	 * 
+	 * @param message
+	 * @return error code
+	 */
 	private String getErrorCode(String message) {
 		try {
-			Class<?>[] innerClasses = BaseConstants.class.getClasses();
+			Class<?> msgErrorData = BaseConstants.MSGERROR.class;
 			
-			for (int i = 0; i < innerClasses.length; i++) {
-				if (innerClasses[i].getSimpleName().equals(ERRORKEYS.MSG_ERROR)) {
-					Class<?> msgErrorData = innerClasses[i];
-					
-					for (Field errorKeysFields : msgErrorData.getFields()) {
-						if (errorKeysFields.get(msgErrorData).equals(message)) {
-							return errorKeysFields.getName();
-						}
-					}
+			for (Field errorKeysFields : msgErrorData.getFields()) {
+				if (errorKeysFields.get(msgErrorData).equals(message)) {
+					return errorKeysFields.getName();
 				}
 			}
+			
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 		}
 		
 		return MSGERROR.DEFAULT_ERROR_CODE;

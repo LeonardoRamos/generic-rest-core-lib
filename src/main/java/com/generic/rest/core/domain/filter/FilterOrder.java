@@ -3,28 +3,63 @@ package com.generic.rest.core.domain.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class responsible for having sorting data.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 public class FilterOrder {
     
-    private String field;
+    private static final SortOrder DEFAULT_SORT_ORDER = SortOrder.ASC;
+    
+	private String field;
     private SortOrder sortOrder;
 	
+    /**
+     * Return field.
+     * 
+     * @return field
+     */
     public String getField() {
 		return field;
 	}
 	
+	/**
+	 * Set field.
+	 * 
+	 * @param field
+	 */
 	public void setField(String field) {
 		this.field = field;
 	}
 	
+	/**
+	 * Return sort order.
+	 * 
+	 * @return {@link SortOrder}
+	 */
 	public SortOrder getSortOrder() {
 		return sortOrder;
 	}
 
+	/**
+	 * Set sort order.
+	 * 
+	 * @param sortOrder
+	 */
 	public void setSortOrder(SortOrder sortOrder) {
 		this.sortOrder = sortOrder;
 	}
 	
-	public static List<FilterOrder> buildFilterOrders(String sort) {
+	/**
+	 * Parse parameter sort of class {@link RequestFilter} and return a list of parsed {@link FilterOrder}. </p>
+	 * Default sorting order is {@link SortOrder#ASC}.
+	 * 
+	 * @param sort
+	 * @return List of {@link FilterOrder}
+	 */
+	public static List<FilterOrder> of(String sort) {
 		List<FilterOrder> filterOrders = new ArrayList<>();
 		
 		if (sort == null) {
@@ -38,9 +73,11 @@ public class FilterOrder {
 			
 			if (sort.charAt(i) != ',') {
 				sortField.append(sort.charAt(i));
+			
 			} else {
 				fillSortValues(filterOrder, sortField.toString());
 				filterOrders.add(filterOrder);
+				
 				filterOrder = new FilterOrder();
 				sortField = new StringBuilder();
 			}
@@ -52,15 +89,27 @@ public class FilterOrder {
 		return filterOrders;
 	}
 
+	/**
+	 * Fill sort values from parameter to new entity of {@link FilterOrder}.
+	 * 
+	 * @param filterOrder
+	 * @param sortField
+	 */
 	private static void fillSortValues(FilterOrder filterOrder, String sortField) {
 		StringBuilder field = new StringBuilder();
-		SortOrder sortOrder = SortOrder.ASC;
+		SortOrder sortOrder = DEFAULT_SORT_ORDER;
 		
 		for (int i = 0; i < sortField.length(); i++) {
+			
 			if (sortField.charAt(i) != '=') {
 				field.append(sortField.charAt(i));
+			
 			} else {
-				sortOrder = getSortOrder(sortField, sortOrder, i);
+				SortOrder parsedSortOrer = SortOrder.of(sortField.substring(i + 1, sortField.length()).trim());
+				
+				if (parsedSortOrer != null) {
+					sortOrder = parsedSortOrer;
+				}
 				break;
 			}
 		}
@@ -69,21 +118,11 @@ public class FilterOrder {
 		filterOrder.setSortOrder(sortOrder);
 	}
 
-	private static SortOrder getSortOrder(String sortField, SortOrder sortOrder, int index) {
-		StringBuilder sortOrderValue = new StringBuilder();
-		
-		if ((index + 1) < sortField.length()) {
-			sortOrderValue.append(sortField.substring(index + 1, sortField.length()));
-		}
-		
-		SortOrder order = SortOrder.getSortOrder(sortOrderValue.toString().trim());
-		if (sortOrder != null) {
-			sortOrder = order;
-		}
-		
-		return sortOrder;
-	}
-
+	/**
+	 * Filter order toString.
+	 *
+	 * @return toString
+	 */
 	@Override
 	public String toString() {
 		return "FilterOrder [field=" + field + ", sortOrder=" + sortOrder + "]";

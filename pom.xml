@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<name>generic-rest-core-lib</name>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.generic.rest.core</groupId>
 	<artifactId>generic-rest-core-lib</artifactId>
@@ -15,12 +15,24 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
+		<version>3.3.4</version>
 		<relativePath />
 	</parent>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<downloadSources>true</downloadSources>
+		<downloadJavadocs>true</downloadJavadocs>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		
+		<!-- Dependencies -->
+		<io-jsonwebtoken-version>0.12.6</io-jsonwebtoken-version>
+		
+		<!--  Plugins -->
+		<maven-eclipse-plugin-version>2.10</maven-eclipse-plugin-version>
 	</properties>
 
 	<profiles>
@@ -67,6 +79,36 @@
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		
+		<dependency>
+	        <groupId>com.github.ben-manes.caffeine</groupId>
+	        <artifactId>caffeine</artifactId>
+	    </dependency>
+		
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt-api</artifactId>
+		    <version>${io-jsonwebtoken-version}</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${io-jsonwebtoken-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${io-jsonwebtoken-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -82,24 +124,36 @@
 			<artifactId>flyway-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.9.1</version>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 
 	 <build>
      	<plugins>
-        	<plugin>
-            	<groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+     		<plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                   	<release>${java.version}</release>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
+            
+     	    <plugin>
+	        	<groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-surefire-plugin</artifactId>
+		        <configuration>
+		            <trimStackTrace>false</trimStackTrace>
+		        </configuration>
+		    </plugin>
+		    
+		    <plugin>
+	        	<groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-eclipse-plugin</artifactId>
+		        <version>${maven-eclipse-plugin-version}</version>
+		        <configuration>
+		            <downloadSources>true</downloadSources>
+		            <downloadjavadocs>true</downloadjavadocs>
+		        </configuration>
+		    </plugin>
         </plugins>
 	</build>
 

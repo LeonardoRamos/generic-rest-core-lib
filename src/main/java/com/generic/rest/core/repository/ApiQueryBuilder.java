@@ -6,19 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
-
 import com.generic.rest.core.BaseConstants;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.filter.AggregateFunction;
 import com.generic.rest.core.domain.filter.FilterExpression;
 import com.generic.rest.core.domain.filter.FilterField;
+import com.generic.rest.core.domain.filter.FilterOperator;
 import com.generic.rest.core.domain.filter.FilterOrder;
 import com.generic.rest.core.domain.filter.LogicOperator;
 import com.generic.rest.core.domain.filter.RequestFilter;
@@ -26,45 +19,93 @@ import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.util.ReflectionUtils;
 import com.generic.rest.core.util.StringParserUtils;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
+
+/**
+ * Class responsible for building JPA query related filters.
+ * 
+ * @author leonardo.ramos
+ *
+ * @param <E>
+ */
 @SuppressWarnings({ "unchecked", "rawtypes" } )
 public class ApiQueryBuilder<E> {
 	
-	public Boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection) {
+	/**
+	 * Verify if given projection has any collection / multi valued field.
+	 * 
+	 * @param projection
+	 * @return true if selection has multi valued / collection projection, false otherwise.
+	 */
+	public boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
-			return Boolean.FALSE;
+			return false;
 		}
 		
 		for (Selection<? extends Object> projectionField : projection) {
 			Path<Object> attributePath = (Path<Object>) projectionField;
 			
 			if (Collection.class.isAssignableFrom(attributePath.getJavaType())) {
-				return Boolean.TRUE;
+				return true;
 			}
 		}
 		
-		return Boolean.FALSE;
+		return false;
 	}
 	
+	/**
+	 * Build group by fields selection from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param root
+	 * @param entityClass
+	 * @return Selection of group by fields
+	 * @throws BadRequestApiException
+	 */
 	public List<Selection<? extends Object>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
-			List<String> groupByFields = requestFilter.getParsedGroupBy();
-			return buildProjectionSelection(root, entityClass, groupByFields);
+			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
+			return this.buildProjectionSelection(root, entityClass, groupByFields);
 			
 		} catch (Exception e) {
 			throw new BadRequestApiException(String.format(MSGERROR.PARSE_PROJECTIONS_ERROR, requestFilter.getProjection()), e);
 		}
 	}
 	
+	/**
+	 * Build projection fields selection from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param root
+	 * @param entityClass
+	 * @return Selection of projection fields
+	 * @throws BadRequestApiException
+	 */
 	public List<Selection<? extends Object>> getProjectionFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
-			List<String> projectionFields = requestFilter.getParsedProjection();
-			return buildProjectionSelection(root, entityClass, projectionFields);
+			List<String> projectionFields = StringParserUtils.splitStringList(requestFilter.getProjection(), ',');
+			return this.buildProjectionSelection(root, entityClass, projectionFields);
 			
 		} catch (Exception e) {
 			throw new BadRequestApiException(String.format(MSGERROR.PARSE_PROJECTIONS_ERROR, requestFilter.getProjection()), e);
 		}
 	}
 	
+	/**
+	 * Build list of selection of a given projection by its real classes types.
+	 * 
+	 * @param root
+	 * @param entityClass
+	 * @param projectionFields
+	 * @return Selection of group by fields
+	 * @throws NoSuchFieldException
+	 */
 	private List<Selection<? extends Object>> buildProjectionSelection(Root<?> root, Class<E> entityClass,
 			List<String> projectionFields) throws NoSuchFieldException {
 		
@@ -74,42 +115,52 @@ public class ApiQueryBuilder<E> {
 			
 			for (String fieldName : projectionFields) {
 				List<Field> fields = splitFields(entityClass, fieldName);
-				projection.add(buildFieldExpression(fields, root));
+				projection.add(this.getFieldExpressionPath(fields, root));
 			}
 		}
 		
 		return projection;
 	}
 	
-	public List<Selection<? extends Object>> buildAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
+	/**
+	 * Build aggregation fields selection from {@link RequestFilter}.
+	 * 
+	 * @param root
+	 * @param criteriaBuilder
+	 * @param entityClass
+	 * @param requestFilter
+	 * @return Selection of aggregation fields
+	 * @throws BadRequestApiException
+	 */
+	public List<Selection<? extends Object>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			RequestFilter requestFilter) throws BadRequestApiException {
 		try {
-			List<String> sumFields = requestFilter.getParsedSum();
-			List<String> avgFields = requestFilter.getParsedAvg();
-			List<String> countFields = requestFilter.getParsedCount();
-			List<String> countDistinctFields = requestFilter.getParsedCountDistinct();
-			List<String> groupByFields = requestFilter.getParsedGroupBy();
+			List<String> sumFields = StringParserUtils.splitStringList(requestFilter.getSum(), ',');
+			List<String> avgFields = StringParserUtils.splitStringList(requestFilter.getAvg(), ',');
+			List<String> countFields = StringParserUtils.splitStringList(requestFilter.getCount(), ',');
+			List<String> countDistinctFields = StringParserUtils.splitStringList(requestFilter.getCountDistinct(), ',');
+			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
 			
 			List<Selection<? extends Object>> aggregationFields = new ArrayList<>();
 			
 			if (!sumFields.isEmpty()) {
-				addAggregationFields(root, criteriaBuilder, entityClass, sumFields, aggregationFields, AggregateFunction.SUM.name());
+				this.addAggregationFields(root, criteriaBuilder, entityClass, sumFields, aggregationFields, AggregateFunction.SUM.name());
 			}
 			
 			if (!countFields.isEmpty()) {
-				addAggregationFields(root, criteriaBuilder, entityClass, countFields, aggregationFields, AggregateFunction.COUNT.name());
+				this.addAggregationFields(root, criteriaBuilder, entityClass, countFields, aggregationFields, AggregateFunction.COUNT.name());
 			}
 			
 			if (!countDistinctFields.isEmpty()) {
-				addAggregationFields(root, criteriaBuilder, entityClass, countDistinctFields, aggregationFields, AggregateFunction.COUNT_DISTINCT.name());
+				this.addAggregationFields(root, criteriaBuilder, entityClass, countDistinctFields, aggregationFields, AggregateFunction.COUNT_DISTINCT.name());
 			}
 			
 			if (!avgFields.isEmpty()) {
-				addAggregationFields(root, criteriaBuilder, entityClass, avgFields, aggregationFields, AggregateFunction.AVG.name());
+				this.addAggregationFields(root, criteriaBuilder, entityClass, avgFields, aggregationFields, AggregateFunction.AVG.name());
 			}
 			
 			if (!groupByFields.isEmpty()) {
-				addAggregationFields(root, criteriaBuilder, entityClass, groupByFields, aggregationFields, null);
+				this.addAggregationFields(root, criteriaBuilder, entityClass, groupByFields, aggregationFields, null);
 			}
 			
 			return aggregationFields;
@@ -119,37 +170,58 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Add aggregation filter path to an existing JPA {@link CriteriaBuilder}.
+	 * 
+	 * @param root
+	 * @param criteriaBuilder
+	 * @param entityClass
+	 * @param requestFields
+	 * @param aggregationFields
+	 * @param aggregateFunction
+	 * @throws NoSuchFieldException
+	 */
 	private void addAggregationFields(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			List<String> requestFields, List<Selection<? extends Object>> aggregationFields, String aggregateFunction) throws NoSuchFieldException {
 		
 		for (String fieldName : requestFields) {
 			List<Field> fields = splitFields(entityClass, fieldName);
 			
-			if (Boolean.TRUE.equals(AggregateFunction.isSumFunction(aggregateFunction))) {
-				aggregationFields.add(criteriaBuilder.sum(buildFieldExpression(fields, root)));
+			if (AggregateFunction.isSumFunction(aggregateFunction)) {
+				aggregationFields.add(criteriaBuilder.sum(this.getFieldExpressionPath(fields, root)));
 				
-			} else if (Boolean.TRUE.equals(AggregateFunction.isAvgFunction(aggregateFunction))) {
-				aggregationFields.add(criteriaBuilder.avg(buildFieldExpression(fields, root)));
+			} else if (AggregateFunction.isAvgFunction(aggregateFunction)) {
+				aggregationFields.add(criteriaBuilder.avg(this.getFieldExpressionPath(fields, root)));
 				
-			} else if (Boolean.TRUE.equals(AggregateFunction.isCountFunction(aggregateFunction))) {
-				aggregationFields.add(criteriaBuilder.count(buildFieldExpression(fields, root)));
+			} else if (AggregateFunction.isCountFunction(aggregateFunction)) {
+				aggregationFields.add(criteriaBuilder.count(this.getFieldExpressionPath(fields, root)));
 				
-			} else if (Boolean.TRUE.equals(AggregateFunction.isCountDistinctFunction(aggregateFunction))) {
-				aggregationFields.add(criteriaBuilder.countDistinct(buildFieldExpression(fields, root)));
+			} else if (AggregateFunction.isCountDistinctFunction(aggregateFunction)) {
+				aggregationFields.add(criteriaBuilder.countDistinct(this.getFieldExpressionPath(fields, root)));
 				
 			} else {
-				aggregationFields.add(buildFieldExpression(fields, root));
+				aggregationFields.add(this.getFieldExpressionPath(fields, root));
 			}
 		}
 	}
 
+	/**
+	 * Build a list of {@link Predicate} according to a query filter of a given {@link RequestFilter}.
+	 * 
+	 * @param entityClass
+	 * @param requestFilter
+	 * @param criteriaBuilder
+	 * @param root
+	 * @return List of {@link Predicate}
+	 * @throws BadRequestApiException
+	 */
 	public List<Predicate> getRestrictions(
 			Class<E> entityClass,
 			RequestFilter requestFilter, 
 			CriteriaBuilder criteriaBuilder,
 			Root<?> root) throws BadRequestApiException {
 		try {
-			FilterExpression currentExpression = FilterExpression.buildFilterExpressions(requestFilter.getFilter());
+			FilterExpression currentExpression = FilterExpression.of(requestFilter.getFilter());
 			List<Predicate> restrictions = new ArrayList<>();
 			
 			while (currentExpression != null) {
@@ -158,7 +230,7 @@ public class ApiQueryBuilder<E> {
 				if (currentExpression.getFilterField() != null) {
 					if (LogicOperator.OR.equals(currentExpression.getLogicOperator())) {
 						
-						currentExpression = getOrRestrictions(entityClass, criteriaBuilder, root, currentExpression, conjunctionRestrictions);
+						currentExpression = this.getOrRestrictions(entityClass, criteriaBuilder, root, currentExpression, conjunctionRestrictions);
 						
 						List<Predicate> orParsedRestrictions = new ArrayList<>();
 						orParsedRestrictions.add(criteriaBuilder.or(conjunctionRestrictions.toArray(new Predicate[]{})));
@@ -171,7 +243,7 @@ public class ApiQueryBuilder<E> {
 					}
 				}
 				
-				currentExpression = currentExpression != null ?currentExpression.getFilterNestedExpression() : currentExpression;
+				currentExpression = currentExpression != null ? currentExpression.getFilterNestedExpression() : currentExpression;
 			}
 	        
 			return restrictions;
@@ -181,73 +253,112 @@ public class ApiQueryBuilder<E> {
 		}
 	}
 
+	/**
+	 * Fill the {@link Predicate} with the restrictions and the query related to the 
+	 * {@link FilterExpression} of {@link LogicOperator#OR} operator and return the next nested 
+	 * expression after the {@link LogicOperator#OR} expression.
+	 * 
+	 * @param entityClass
+	 * @param criteriaBuilder
+	 * @param root
+	 * @param currentExpression
+	 * @param conjunctionRestrictions
+	 * @return {@link FilterExpression}
+	 * @throws NoSuchFieldException
+	 * @throws IOException
+	 */
 	private FilterExpression getOrRestrictions(Class<E> entityClass, CriteriaBuilder criteriaBuilder, Root<?> root,
 			FilterExpression currentExpression, List<Predicate> conjunctionRestrictions)
 			throws NoSuchFieldException, IOException {
 		
 		do {
-			conjunctionRestrictions.add(buildPredicate(entityClass, currentExpression.getFilterField(), criteriaBuilder, root));
+			conjunctionRestrictions.add(this.buildPredicate(entityClass, currentExpression.getFilterField(), criteriaBuilder, root));
 			currentExpression = currentExpression.getFilterNestedExpression();
+		
 		} while (currentExpression != null && LogicOperator.OR.equals(currentExpression.getLogicOperator()));
 		
 		if (currentExpression != null && currentExpression.getFilterField() != null) {
-			conjunctionRestrictions.add(buildPredicate(entityClass, currentExpression.getFilterField(), criteriaBuilder, root));
+			conjunctionRestrictions.add(this.buildPredicate(entityClass, currentExpression.getFilterField(), criteriaBuilder, root));
 		}
 		
 		return currentExpression;
 	}
 
+	/**
+	 * Build query {@link Predicate} based on {@link FilterField} field, expected value and a {@link FilterOperator}.
+	 * 
+	 * @param entityClass
+	 * @param filterField
+	 * @param criteriaBuilder
+	 * @param root
+	 * @return Predicate
+	 * @throws NoSuchFieldException
+	 * @throws IOException
+	 */
 	private Predicate buildPredicate(
 			Class<E> entityClass,
 			FilterField filterField, 
 			CriteriaBuilder criteriaBuilder, 
 			Root<?> root) throws NoSuchFieldException, IOException {
 
-		List<Field> fields = splitFields(entityClass, filterField.getField());
+		List<Field> fields = this.splitFields(entityClass, filterField.getField());
 		Field field = null;
 		
 		switch (filterField.getFilterOperator()) {
 			case IN:
-				field = getSignificantField(fields);
-				return buildFieldExpression(fields, root)
-						.in(ReflectionUtils.getFieldList(
-								StringParserUtils.replace(StringParserUtils.replace(filterField.getValue(), "(", ""), ")", ""),
-								field.getType()));
+				field = this.getSignificantField(fields);
+				
+				String normalizedValues = StringParserUtils.replace(filterField.getValue(), new String[]{"(", ")"}, "");
+				
+				return this.getFieldExpressionPath(fields, root)
+						.in(ReflectionUtils.getTypifiedValue(StringParserUtils.splitStringList(normalizedValues, ','), field.getType()));
 			case OU:
-				field = getSignificantField(fields);
-				return buildFieldExpression(fields, root)
-						.in(ReflectionUtils.getFieldList(filterField.getValue(), field.getType())).not();
+				field = this.getSignificantField(fields);
+				
+				normalizedValues = StringParserUtils.replace(filterField.getValue(), new String[]{"(", ")"}, "");
+				
+				return this.getFieldExpressionPath(fields, root)
+						.in(ReflectionUtils.getTypifiedValue(StringParserUtils.splitStringList(normalizedValues, ','), field.getType())).not();
 			case GE:
-				return criteriaBuilder.greaterThanOrEqualTo(buildFieldExpression(
-						fields, root), (Comparable) getTypifiedValue(filterField, fields));
+				return criteriaBuilder.greaterThanOrEqualTo(this.getFieldExpressionPath(
+						fields, root), (Comparable) this.getTypifiedValue(filterField, fields));
 			case GT:
-				return criteriaBuilder.greaterThan(buildFieldExpression(
-						fields, root), (Comparable) getTypifiedValue(filterField, fields));
+				return criteriaBuilder.greaterThan(this.getFieldExpressionPath(
+						fields, root), (Comparable) this.getTypifiedValue(filterField, fields));
 			case LE:
-				return criteriaBuilder.lessThanOrEqualTo(buildFieldExpression(
-						fields, root), (Comparable) getTypifiedValue(filterField, fields));
+				return criteriaBuilder.lessThanOrEqualTo(this.getFieldExpressionPath(
+						fields, root), (Comparable) this.getTypifiedValue(filterField, fields));
 			case LT:
-				return criteriaBuilder.lessThan(buildFieldExpression(
-						fields, root), (Comparable) getTypifiedValue(filterField, fields));
+				return criteriaBuilder.lessThan(this.getFieldExpressionPath(
+						fields, root), (Comparable) this.getTypifiedValue(filterField, fields));
 			case NE:
 				if (BaseConstants.NULL_VALUE.equals(filterField.getValue())) {
-					return criteriaBuilder.isNotNull(buildFieldExpression(fields, root));
+					return criteriaBuilder.isNotNull(this.getFieldExpressionPath(fields, root));
 				}
-				return criteriaBuilder.notEqual(buildFieldExpression(
-						fields, root), getTypifiedValue(filterField, fields));
+				return criteriaBuilder.notEqual(this.getFieldExpressionPath(
+						fields, root), this.getTypifiedValue(filterField, fields));
 			case LK:
-				return criteriaBuilder.like(criteriaBuilder.upper(buildFieldExpression(fields, root)), 
-						"%" + ((String) getTypifiedValue(filterField, fields)).toUpperCase() + "%");
+				return criteriaBuilder.like(criteriaBuilder.upper(this.getFieldExpressionPath(fields, root)), 
+						"%" + ((String) this.getTypifiedValue(filterField, fields)).toUpperCase() + "%");
 			case EQ:
 			default:
 				if (BaseConstants.NULL_VALUE.equals(filterField.getValue())) {
-					return criteriaBuilder.isNull(buildFieldExpression(fields, root));
+					return criteriaBuilder.isNull(this.getFieldExpressionPath(fields, root));
 				}
-				return criteriaBuilder.equal(buildFieldExpression(
-						fields, root), getTypifiedValue(filterField, fields));
+				return criteriaBuilder.equal(this.getFieldExpressionPath(
+						fields, root), this.getTypifiedValue(filterField, fields));
 		}
 	}
 
+	/**
+	 * Split a field into a chained list of its subfields.
+	 * 
+	 * @param entityClass
+	 * @param fieldName
+	 * @return List of {@link Field}
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 */
 	private List<Field> splitFields(Class<E> entityClass, String fieldName) throws NoSuchFieldException, SecurityException {
 		List<Field> fields = new ArrayList<>();
 		List<String> attributeNames =  StringParserUtils.splitStringList(fieldName, '.');
@@ -262,13 +373,29 @@ public class ApiQueryBuilder<E> {
 		return fields;
 	}
 
+	/**
+	 * Return the typified value of a leaf last subfield.
+	 * 
+	 * @param filterField
+	 * @param fields
+	 * @return The value of the field
+	 * @throws IOException
+	 * @throws NoSuchFieldException
+	 */
 	private Object getTypifiedValue(FilterField filterField, List<Field> fields)
 			throws IOException, NoSuchFieldException {
 		
-		Field field = getSignificantField(fields);
-		return ReflectionUtils.getEntityValueParsed(filterField.getValue(), field.getType());
+		Field field = this.getSignificantField(fields);
+		return ReflectionUtils.getTypifiedValue(filterField.getValue(), field.getType());
 	}
 
+	/**
+	 * Return leaf last subfield
+	 * 
+	 * @param fields
+	 * @return {@link Field}
+	 * @throws NoSuchFieldException
+	 */
 	private Field getSignificantField(List<Field> fields) throws NoSuchFieldException {
 		if (fields.isEmpty()) {
 			throw new NoSuchFieldException();
@@ -277,7 +404,15 @@ public class ApiQueryBuilder<E> {
 		return fields.get(fields.size() - 1);
 	}
 	
-	private Expression buildFieldExpression(List<Field> fields, Root<?> root) throws NoSuchFieldException {
+	/**
+	 * Build {@link Expression} of {@link Path} for given fields.
+	 * 
+	 * @param fields
+	 * @param root
+	 * @return {@link Expression}
+	 * @throws NoSuchFieldException
+	 */
+	private Expression getFieldExpressionPath(List<Field> fields, Root<?> root) throws NoSuchFieldException {
 		Path<E> expressionPath = null;
 		
 		for (Field field : fields) {
@@ -297,6 +432,16 @@ public class ApiQueryBuilder<E> {
 		return expressionPath;
 	}
 	
+	/**
+	 * Build a list of {@link Order} from {@link RequestFilter}.
+	 * 
+	 * @param requestFilter
+	 * @param criteriaBuilder
+	 * @param root
+	 * @param entityClass
+	 * @return List of {@link Order}
+	 * @throws BadRequestApiException
+	 */
 	public List<Order> getOrders(
 			RequestFilter requestFilter, 
 			CriteriaBuilder criteriaBuilder,
@@ -304,21 +449,21 @@ public class ApiQueryBuilder<E> {
 			Class<E> entityClass) throws BadRequestApiException {
 		
 		try {
-			List<FilterOrder> filterOrders = FilterOrder.buildFilterOrders(requestFilter.getSort());
+			List<FilterOrder> filterOrders = FilterOrder.of(requestFilter.getSort());
 			List<Order> orders = new ArrayList<>();
 	        
 			if (filterOrders != null && !filterOrders.isEmpty()) {
 	        	
 	        	for (FilterOrder filterOrder : filterOrders) {
-	        		List<Field> fields =  splitFields(entityClass, filterOrder.getField());
+	        		List<Field> fields =  this.splitFields(entityClass, filterOrder.getField());
 
 	        		switch (filterOrder.getSortOrder()) {
 	        			case DESC:
-	        				orders.add(criteriaBuilder.desc(buildFieldExpression(fields, root)));
+	        				orders.add(criteriaBuilder.desc(this.getFieldExpressionPath(fields, root)));
 	        				break;
 	        			case ASC:
 	        			default:
-	        				orders.add(criteriaBuilder.asc(buildFieldExpression(fields, root)));
+	        				orders.add(criteriaBuilder.asc(this.getFieldExpressionPath(fields, root)));
 	        				break;
 	        		}
 	        	}

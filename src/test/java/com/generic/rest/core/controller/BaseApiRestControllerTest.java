@@ -37,7 +37,6 @@ import com.generic.rest.core.domain.Role;
 import com.generic.rest.core.domain.User;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.service.AddressService;
-import com.generic.rest.core.service.CountryService;
 import com.generic.rest.core.service.UserService;
 
 @SpringBootTest
@@ -57,9 +56,6 @@ class BaseApiRestControllerTest {
 	@Autowired
 	private AddressService addressService;
 
-	@Autowired
-	private CountryService countryService;
-     
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private HttpHeaders authHeader = new HttpHeaders();
      
@@ -132,7 +128,7 @@ class BaseApiRestControllerTest {
 				.build();
     	 
 		Address address = Address.builder()
-				.street("Street Test 11")
+				.street(newUserStreet)
 				.state("RJ")
 				.streetNumber("Street 11")
 				.country(country)
@@ -243,6 +239,48 @@ class BaseApiRestControllerTest {
            	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
            	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
 	}
+	
+	@Test
+	void getAllUsers_OkSortAsc() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name=asc]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
+	
+	@Test
+	void getAllUsers_OkSortDesc() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name=desc]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
+	
+	@Test
+	void getAllUsers_OkSortDefault() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
+				.append("?sort=[name]")
+				.toString())
+			.headers(authHeader))
+           	.andExpect(status().isOk())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[0].name").value("User_Test_1"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9]").exists())
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[9].name").value("User_Test_9"))
+           	.andExpect(MockMvcResultMatchers.jsonPath("$.records[10]").doesNotExist());
+	}
      
 	@Test
 	void getAllUsersSingleProjection_Ok() throws Exception {
@@ -317,7 +355,7 @@ class BaseApiRestControllerTest {
 	}
 	
 	@Test
-	void getAllUsersAggregationMultipleCount_Ok() throws Exception {
+	void getAllUsersAggregationMultipleCountTypes_Ok() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.get(new StringBuilder(ApiConstants.CONTROLLER.USER.PATH)
 				.append("?count=[address.street,address.streetNumber]&countDistinct=[id]")
 				.toString())
@@ -370,13 +408,10 @@ class BaseApiRestControllerTest {
 	@AfterEach
 	void clear() {
 		for (int i = 0; i < usersDatabase.size(); i++) {
-    		 
 			try {
-				countryService.delete(usersDatabase.get(i).getAddress().getCountry().getExternalId());
+				userService.delete(usersDatabase.get(i).getExternalId());
 			} catch (NotFoundApiException e) {}
     		 
-			addressService.delete(usersDatabase.get(i).getAddress().getExternalId());
-			userService.delete(usersDatabase.get(i).getExternalId());
 		}
 	}
 

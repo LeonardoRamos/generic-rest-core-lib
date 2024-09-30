@@ -1,8 +1,5 @@
 package com.generic.rest.core.config.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,43 +10,61 @@ import org.springframework.web.servlet.ModelAndView;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.UnauthorizedApiException;
-import com.generic.rest.core.service.TokenService;
+import com.generic.rest.core.service.impl.TokenService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Implementation of {@link HandlerInterceptor} to process JWT Token authenticaton of all endpoints.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
 	@Value(JWTAUTH.AUTH_DISABLED)
-	private Boolean authDisabled;
+	private boolean authDisabled;
 	
 	@Autowired
 	private TokenService tokenService;
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object objectHandler) {
-		if ((authDisabled == null || Boolean.FALSE.equals(authDisabled)) &&
-				objectHandler instanceof HandlerMethod) {
+		if (!this.authDisabled && objectHandler instanceof HandlerMethod) {
 			
 			HandlerMethod handler = (HandlerMethod) objectHandler;
 			
 			NoSecurity noSecurity = handler.getMethodAnnotation(NoSecurity.class);
+			
 			if (noSecurity == null) {
 				
-				String token = tokenService.getTokenFromRequest(request);
-				if (token == null || "".equals(token) || Boolean.FALSE.equals(tokenService.validateToken(token))) {
+				String token = this.tokenService.getTokenFromRequest(request);
+				if (token == null || "".equals(token) || !this.tokenService.validateToken(token)) {
 					throw new UnauthorizedApiException(MSGERROR.AUTHORIZATION_TOKEN_NOT_VALID);
 				}
 			}
 		}
             
-        return Boolean.TRUE;
+        return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 		/* Does not need postHandle implementation */
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {

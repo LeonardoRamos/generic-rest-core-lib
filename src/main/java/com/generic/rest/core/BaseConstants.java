@@ -1,7 +1,16 @@
 package com.generic.rest.core;
 
+/**
+ * Base class for api commom constants.
+ * 
+ * @author leonardo.ramos
+ *
+ */
 public final class BaseConstants {
 	
+	/**
+	 * Default constructor.
+	 */
 	private BaseConstants() {
 		
 	}
@@ -12,8 +21,17 @@ public final class BaseConstants {
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";
 	public static final String NULL_VALUE = "null";
 	
+	/**
+	 * Tomcat webserver constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public final class TOMCAT {
 		
+		/**
+		 * Default constructor.
+		 */
 		private TOMCAT() {
 			
 		}
@@ -24,14 +42,32 @@ public final class BaseConstants {
 		public static final String RELAXED_SERVER_PATH_VALUE = "[]|";
 	}
 	
+	/**
+	 * Health check constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public static final class HEALTHCHECK {
 		
+		/**
+		 * Default constructor.
+		 */
 		private HEALTHCHECK() {
 			
 		}
 		
+		/**
+		 * Database constants.
+		 * 
+		 * @author leonardo.ramos
+		 *
+		 */
 		public static final class DATABASE {
 			
+			/**
+			 * Default constructor.
+			 */
 			private DATABASE() {
 				
 			}
@@ -43,8 +79,17 @@ public final class BaseConstants {
 		}
 	}
 	
+	/**
+	 * API Controller constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public static final class CONTROLLER {
 		
+		/**
+		 * Default constructor.
+		 */
 		private CONTROLLER() {
 			
 		}
@@ -61,8 +106,17 @@ public final class BaseConstants {
 		public static final String BASE_PATH = PATH_SEPARATOR + VERSION + PATH_SEPARATOR;
 	}
 
+	/**
+	 * JWT constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public final class JWTAUTH {
 		
+		/**
+		 * Default constructor.
+		 */
 		private JWTAUTH() {
 			
 		}
@@ -71,11 +125,9 @@ public final class BaseConstants {
 		public static final String EXPIRATION_TIME = "${jwt.expiration:86000000}";
 		public static final String SECRET = "${jwt.secret:6cfaef779158723ca4998ec416d18eb8}";
 		public static final String TOKEN_PREFIX = "${jwt.prefix:Bearer}";
-		public static final String HEADER_STRINGS = "${jwt.header.strings:Authorization}";
 		public static final String CLAIM_PRINCIPAL_CREDENTIAL = "email";
 		public static final String CLAIM_ADDITIONAL_INFO = "name";
 		public static final String CLAIM_CREDENTIAL_ROLE = "role";
-		public static final String CLAIM_EXTERNAL_ID = "userExternalId";
 		public static final String TOKEN = "token";
 		public static final String BEARER = "Bearer";
 		public static final String X_ACCESS_TOKEN = "x-access-token";
@@ -87,8 +139,17 @@ public final class BaseConstants {
 		public static final String ALL_PATH_ORIGIN_REGEX = "*";
 	}
 	
+	/**
+	 * Error key constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public static final class ERRORKEYS {
 		
+		/**
+		 * Default constructor.
+		 */
 		private ERRORKEYS() {
 			
 		}
@@ -99,8 +160,17 @@ public final class BaseConstants {
 		public static final String MSG_ERROR = "MSG_ERROR";
 	}
 
+	/**
+	 * Error message constants.
+	 * 
+	 * @author leonardo.ramos
+	 *
+	 */
 	public static final class MSGERROR {
 		
+		/**
+		 * Default constructor.
+		 */
 		private MSGERROR() {
 			
 		}
@@ -119,6 +189,7 @@ public final class BaseConstants {
 		public static final String AUTH_ERROR_INVALID_TOKEN = "Invalid token [{}]";
 		public static final String AUTHORIZATION_TOKEN_NOT_VALID = "Authorization token not valid";
 		public static final String INTERNAL_ERROR = "Unexpected error";
+		public static final String AUTHENTICATION_FAILED_ERROR = "Authentication Failed";
 		public static final String MEDIA_TYPE_NOT_SUPPORTED = "Media type not supported";
 		public static final String METHOD_NOT_SUPPORTED = "Method not supported";
 		public static final String MEDIA_TYPE_NOT_ACCEPTABLE = "Media type not accepted";
