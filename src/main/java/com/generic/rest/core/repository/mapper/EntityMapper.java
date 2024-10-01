@@ -1,6 +1,5 @@
 package com.generic.rest.core.repository.mapper;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,154 +25,29 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Selection;
 
 /**
- * Mapper class responsible for creating the response query entities from the JPA query result.
+ * Interface responsible for mapping JPA Object result rows fields and aggregations for type <E>.
  * 
  * @author leonardo.ramos
  *
  * @param <E>
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class ApiResultMapper<E extends BaseEntity> {
-	
-	/**
-	 * Map result from JPA query.
-	 * 
-	 * @param entityClass
-	 * @param result
-	 * @param projection
-	 * @return List of mapped entities
-	 * @throws ReflectiveOperationException
-	 */
-	public List<E> mapResultSet(
-			Class<E> entityClass, 
-			List<Object> result, 
-			List<Selection<? extends Object>> projection) throws ReflectiveOperationException {
-		
-		List<E> entities = new ArrayList<>();
-		
-		for (Object row : result) {
-			
-			if (row != null) {
-				if (Object[].class.equals(row.getClass())) {
-					entities.add(this.mapSimpleValuesSelection(entityClass, projection, row));
-					
-				} else if (entityClass.equals(row.getClass())) {
-					entities.add(this.mapEntityObject(entityClass, projection, row));
-					
-				} else {
-					entities.add(this.mapEntityValues(entityClass, projection, row));
-				}
-			}
-		}
-		
-		return entities;
-	}
-	
-	/**
-	 * Map result simple values into an Object of the result type entity.
-	 * 
-	 * @param entityClass
-	 * @param projection
-	 * @param row
-	 * @return entity
-	 * @throws ReflectiveOperationException
-	 */
-	private E mapSimpleValuesSelection(
-			Class<E> entityClass, 
-			List<Selection<? extends Object>> projection, 
-			Object row) throws ReflectiveOperationException {
-		
-		Object[] fieldData = (Object[]) row;
-		
-		Constructor<?> constructor = entityClass.getConstructor();
-		E object = (E) constructor.newInstance();
-		
-		for (int i = 0; i < fieldData.length; i++) {
-			this.mapProjectionPath(entityClass, projection, fieldData[i], object, i);
-		}
-		
-		return object;
-	}
+@FunctionalInterface
+public interface EntityMapper<E extends BaseEntity> {
 
 	/**
-	 * Map a result Object row and its projections into a type entity in case of results of same type as <E>.
+	 * Map result from JPA query into an actual entity <E>.
 	 * 
 	 * @param entityClass
-	 * @param projection
 	 * @param row
-	 * @return entity
+	 * @param projection
+	 * @return E
 	 * @throws ReflectiveOperationException
 	 */
-	private E mapEntityObject(
-			Class<E> entityClass, 
-			List<Selection<? extends Object>> projection,
-			Object row) throws ReflectiveOperationException {
-		
-		E entity = (E) row;
-		
-		if (projection == null || projection.isEmpty()) {
-			return entity;
-		}
-		
-		Constructor<?> constructor = entityClass.getConstructor();
-		E object = (E) constructor.newInstance();
-		
-		for (Field field : entityClass.getDeclaredFields()) {
-		    field.setAccessible(true);
-		    
-			if (this.isInProjection(field.getName(), projection)) {
-				field.set(object, field.get(entity));
-			}
-		}
-		
-		return object;
-	}
+	E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws ReflectiveOperationException;
 	
 	/**
-	 * Verify if fieldName is list of {@link Selection} projection.
-	 * 
-	 * @param fieldName
-	 * @param projection
-	 * @return true if fieldName is in projection false otherwise
-	 */
-	private boolean isInProjection(String fieldName, List<Selection<? extends Object>> projection) {
-		if (projection == null || projection.isEmpty()) {
-			return false;
-		}
-		
-		for (Selection<? extends Object> projectionField : projection) {
-			if (fieldName.equals(projectionField.getAlias())) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	/**
-	 * Map a result Object row of values and its projections into a type entity in case of aggregations.
-	 * 
-	 * @param entityClass
-	 * @param projection
-	 * @param row
-	 * @return entity
-	 * @throws ReflectiveOperationException
-	 */
-	private E mapEntityValues(
-			Class<E> entityClass, 
-			List<Selection<? extends Object>> projection,
-			Object row) throws ReflectiveOperationException {
-		
-		Constructor<?> constructor = entityClass.getConstructor();
-		E object = (E) constructor.newInstance();
-		
-		this.mapProjectionPath(entityClass, projection, row, object, 0);
-		
-		return object;
-	}
-
-	/**
-	 * 
+	 * Map the projection returned from JPA query into entity <E> fields and aggregation fields.
 	 * 
 	 * @param entityClass
 	 * @param projection
@@ -182,7 +56,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 	 * @param projectionIndex
 	 * @throws ReflectiveOperationException
 	 */
-	private void mapProjectionPath(Class<E> entityClass, List<Selection<? extends Object>>  projection, 
+	default void mapProjectionPath(Class<E> entityClass, List<Selection<? extends Object>>  projection, 
 			Object row, E object, int projectionIndex) throws ReflectiveOperationException {
 		
 		if (projection != null && projection.get(projectionIndex) instanceof SelfRenderingSqmAggregateFunction) {
@@ -223,7 +97,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 
 		return (SqmBasicValuedSimplePath<Object>) ((SqmDistinct<Object>) aggregationData).getExpression();
 	}
-
+	
 	/**
 	 * Map sum aggregation values.
 	 * 
@@ -343,9 +217,9 @@ public class ApiResultMapper<E extends BaseEntity> {
 			}
 		}
 	}
-
+	
 	/**
-	 * Map adn set the last nested projection of a subfield.
+	 * Map and set the last nested projection of a subfield.
 	 * 
 	 * @param clazz
 	 * @param fieldData
@@ -360,7 +234,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 		fieldRoot.setAccessible(true);
 		this.setFieldValue(fieldData, object, fieldRoot);
 	}
-
+	
 	/**
 	 * Build all nested fields from a given {@link Path}.
 	 * 
@@ -408,7 +282,7 @@ public class ApiResultMapper<E extends BaseEntity> {
 		
 		return aggregation;
 	}
-
+	
 	/**
 	 * Set a field value in the target entity object.
 	 * 
