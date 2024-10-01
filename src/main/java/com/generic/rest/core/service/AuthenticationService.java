@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
  * @author leonardo.ramos
  *
  */
+@FunctionalInterface
 public interface AuthenticationService {
 
 	/**

@@ -8,8 +8,8 @@ import com.generic.rest.core.exception.ApiException;
 import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.BaseApiRepository;
-import com.generic.rest.core.util.externalid.ExternalIdGenerator;
-import com.generic.rest.core.util.externalid.impl.UUIDExternalIdGenerator;
+import com.generic.rest.core.util.external.id.ExternalIdGenerator;
+import com.generic.rest.core.util.external.id.impl.UUIDExternalIdGenerator;
 
 /**
  * Extends {@link ApiRestServiceImpl} to provide basic REST CRUD operations based on ExternalId and {@link BaseApiEntity}.
@@ -114,7 +114,7 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 	@Override
    	public E save(E entity) throws ApiException {
    		if (entity.getExternalId() == null || "".equals(entity.getExternalId())) {
-   			entity.setExternalId(getExternalIdGenerator().generate());
+   			entity.setExternalId(getExternalIdGenerator().get());
    		}
    		
    		entity.setInsertDate(Calendar.getInstance());

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utilitary class for custom String operations without the use of any time consuming REGEXP.
+ * Utility class for custom String operations without the use of any time consuming REGEXP.
  * 
  * @author leonardo.ramos
  *

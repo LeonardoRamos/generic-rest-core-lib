@@ -1,7 +1,7 @@
 package com.generic.rest.core;
 
 /**
- * Base class for api commom constants.
+ * Base class for API commom constants.
  * 
  * @author leonardo.ramos
  *

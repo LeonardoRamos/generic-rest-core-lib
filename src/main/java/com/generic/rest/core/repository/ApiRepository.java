@@ -28,7 +28,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Selection;
 
 /**
- * API based methods for CRUD operations in generic entities that extends {@link BaseEntity}.
+ * API based methods for CRUD operations in generic entities <E> that extends {@link BaseEntity}.
  * 
  * @author leonardo.ramos
  *

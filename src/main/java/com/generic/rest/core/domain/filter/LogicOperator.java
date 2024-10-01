@@ -3,7 +3,7 @@ package com.generic.rest.core.domain.filter;
 import java.util.Arrays;
 
 /**
- * Enumeration that maps logic filter operations.
+ * Enumeration that maps filter logic operations.
  * 
  * @author leonardo.ramos
  *
