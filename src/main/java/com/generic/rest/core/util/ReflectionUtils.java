@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.generic.rest.core.BaseConstants;
 
 /**
- * 
+ * Utility class for reflection based operations.
  * 
  * @author leonardo.ramos
  *

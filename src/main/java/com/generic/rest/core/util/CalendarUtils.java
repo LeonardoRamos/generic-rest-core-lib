@@ -15,7 +15,7 @@ import com.generic.rest.core.BaseConstants.MSGERROR;
 import io.micrometer.common.util.StringUtils;
 
 /**
- * Utilitary class for {@link Calendar} operations.
+ * Utility class for {@link Calendar} operations.
  * 
  * @author leonardo.ramos
  *

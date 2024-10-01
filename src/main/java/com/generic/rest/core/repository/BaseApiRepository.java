@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.generic.rest.core.domain.BaseApiEntity;
 
 /**
- * Base Api Repository that extends {@link BaseRepository} basic functions and add other operations based on ExternalId.
+ * Base API Repository that extends {@link BaseRepository} basic functions and add other operations based on ExternalId.
  * 
  * @author leonardo.ramos
  *

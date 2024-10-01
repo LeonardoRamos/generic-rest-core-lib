@@ -1,4 +1,4 @@
-package com.generic.rest.core.repository;
+package com.generic.rest.core.repository.query.builder.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -16,6 +16,7 @@ import com.generic.rest.core.domain.filter.FilterOrder;
 import com.generic.rest.core.domain.filter.LogicOperator;
 import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.BadRequestApiException;
+import com.generic.rest.core.repository.query.builder.QueryBuilder;
 import com.generic.rest.core.util.ReflectionUtils;
 import com.generic.rest.core.util.StringParserUtils;
 
@@ -28,21 +29,19 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Selection;
 
 /**
- * Class responsible for building JPA query related filters.
+ * Class that implements the interface {@link QueryBuilder} and is responsible for building JPA query related filters.
  * 
  * @author leonardo.ramos
  *
  * @param <E>
  */
 @SuppressWarnings({ "unchecked", "rawtypes" } )
-public class ApiQueryBuilder<E> {
+public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	
 	/**
-	 * Verify if given projection has any collection / multi valued field.
-	 * 
-	 * @param projection
-	 * @return true if selection has multi valued / collection projection, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
 			return false;
@@ -60,14 +59,9 @@ public class ApiQueryBuilder<E> {
 	}
 	
 	/**
-	 * Build group by fields selection from {@link RequestFilter}.
-	 * 
-	 * @param requestFilter
-	 * @param root
-	 * @param entityClass
-	 * @return Selection of group by fields
-	 * @throws BadRequestApiException
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Selection<? extends Object>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
@@ -79,14 +73,9 @@ public class ApiQueryBuilder<E> {
 	}
 	
 	/**
-	 * Build projection fields selection from {@link RequestFilter}.
-	 * 
-	 * @param requestFilter
-	 * @param root
-	 * @param entityClass
-	 * @return Selection of projection fields
-	 * @throws BadRequestApiException
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Selection<? extends Object>> getProjectionFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> projectionFields = StringParserUtils.splitStringList(requestFilter.getProjection(), ',');
@@ -123,15 +112,9 @@ public class ApiQueryBuilder<E> {
 	}
 	
 	/**
-	 * Build aggregation fields selection from {@link RequestFilter}.
-	 * 
-	 * @param root
-	 * @param criteriaBuilder
-	 * @param entityClass
-	 * @param requestFilter
-	 * @return Selection of aggregation fields
-	 * @throws BadRequestApiException
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Selection<? extends Object>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			RequestFilter requestFilter) throws BadRequestApiException {
 		try {
@@ -206,15 +189,9 @@ public class ApiQueryBuilder<E> {
 	}
 
 	/**
-	 * Build a list of {@link Predicate} according to a query filter of a given {@link RequestFilter}.
-	 * 
-	 * @param entityClass
-	 * @param requestFilter
-	 * @param criteriaBuilder
-	 * @param root
-	 * @return List of {@link Predicate}
-	 * @throws BadRequestApiException
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Predicate> getRestrictions(
 			Class<E> entityClass,
 			RequestFilter requestFilter, 
@@ -433,15 +410,9 @@ public class ApiQueryBuilder<E> {
 	}
 	
 	/**
-	 * Build a list of {@link Order} from {@link RequestFilter}.
-	 * 
-	 * @param requestFilter
-	 * @param criteriaBuilder
-	 * @param root
-	 * @param entityClass
-	 * @return List of {@link Order}
-	 * @throws BadRequestApiException
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Order> getOrders(
 			RequestFilter requestFilter, 
 			CriteriaBuilder criteriaBuilder,

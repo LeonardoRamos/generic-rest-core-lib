@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.generic.rest.core.util.encrypter.TextEncrypter;
 
 /**
- * implementation of {@link TextEncrypter}.
+ * implementation of {@link TextEncrypter} to encrypt texts using BCrypt algorithm.
  * 
  * @author leonardo.ramos
  *

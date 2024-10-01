@@ -11,7 +11,10 @@ import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.exception.InternalErrorApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
-import com.generic.rest.core.repository.mapper.ApiResultMapper;
+import com.generic.rest.core.repository.mapper.ResultMapper;
+import com.generic.rest.core.repository.mapper.impl.ApiResultMapper;
+import com.generic.rest.core.repository.query.builder.QueryBuilder;
+import com.generic.rest.core.repository.query.builder.impl.ApiQueryBuilder;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -25,7 +28,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Selection;
 
 /**
- * API based methods for CRUD operations in generic entities that extends {@link BaseEntity}.
+ * API based methods for CRUD operations in generic entities <E> that extends {@link BaseEntity}.
  * 
  * @author leonardo.ramos
  *
@@ -35,8 +38,8 @@ import jakarta.persistence.criteria.Selection;
 public class ApiRepository<E extends BaseEntity> {
 	
 	private EntityManager entityManager;
-	private ApiQueryBuilder<E> apiQueryBuilder;
-	private ApiResultMapper<E> apiResultMapper;
+	private QueryBuilder<E> queryBuilder;
+	private ResultMapper<E> resultMapper;
 
 	/**
 	 * Constructor
@@ -47,8 +50,8 @@ public class ApiRepository<E extends BaseEntity> {
 	public ApiRepository(EntityManager entityManager) {
 		this.entityManager = entityManager;
 		
-		this.apiQueryBuilder = new ApiQueryBuilder<>();
-		this.apiResultMapper = new ApiResultMapper<>();
+		this.queryBuilder = new ApiQueryBuilder<>();
+		this.resultMapper = new ApiResultMapper<>();
 	}
 	
 	/**
@@ -70,7 +73,7 @@ public class ApiRepository<E extends BaseEntity> {
 
 		query.select(criteriaBuilder.count(root));
 		
-		List<Predicate> restrictions = this.apiQueryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
+		List<Predicate> restrictions = this.queryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
 		
 		if (!restrictions.isEmpty()) {
 			query.where(restrictions.toArray(new Predicate[]{}));
@@ -104,28 +107,28 @@ public class ApiRepository<E extends BaseEntity> {
 			throws NotFoundApiException, BadRequestApiException, InternalErrorApiException {
 		
 		if (requestFilter.hasValidAggregateFunction()) {
-			return aggregate(entityClass, requestFilter);
+			return this.aggregate(entityClass, requestFilter);
 		}
 		
 		CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
 		CriteriaQuery<Object> query = criteriaBuilder.createQuery(Object.class);
 		Root<?> root = query.from(entityClass);
 
-		List<Selection<? extends Object>> projection = this.apiQueryBuilder.getProjectionFields(requestFilter, root, entityClass);
+		List<Selection<? extends Object>> projection = this.queryBuilder.getProjectionFields(requestFilter, root, entityClass);
 		
-		if (!projection.isEmpty() && (projection.size() == 1 || !this.apiQueryBuilder.containsMultiValuedProjection(projection))) {
+		if (!projection.isEmpty() && (projection.size() == 1 || !this.queryBuilder.containsMultiValuedProjection(projection))) {
 			query.multiselect(projection.toArray(new Selection[]{}));
 		} else {
 			query.select(root);
 		}
 		
-		List<Predicate> restrictions = this.apiQueryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
+		List<Predicate> restrictions = this.queryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
 		
 		if (!restrictions.isEmpty()) {
 			query.where(restrictions.toArray(new Predicate[]{}));
 		}
 		
-		List<Order> orders = this.apiQueryBuilder.getOrders(requestFilter, criteriaBuilder, root, entityClass);
+		List<Order> orders = this.queryBuilder.getOrders(requestFilter, criteriaBuilder, root, entityClass);
 		
 		if (!orders.isEmpty()) {
 			query.orderBy(orders);
@@ -137,7 +140,7 @@ public class ApiRepository<E extends BaseEntity> {
 		    		.setFirstResult(requestFilter.getFetchOffset())
 		    		.getResultList();
 		    
-		    return this.apiResultMapper.mapResultSet(entityClass, result, projection);
+		    return this.resultMapper.mapResultSet(entityClass, result, projection);
 		    
 		} catch (NoResultException e) {
 			throw new NotFoundApiException(String.format(MSGERROR.ENTITIES_NOT_FOUND_ERROR, requestFilter), e);
@@ -167,7 +170,7 @@ public class ApiRepository<E extends BaseEntity> {
 		CriteriaQuery<Object> query = criteriaBuilder.createQuery(Object.class);
 		Root<?> root = query.from(entityClass);
 
-		List<Selection<? extends Object>> aggregationFields = this.apiQueryBuilder.getAggregateSelection(root, criteriaBuilder, entityClass, requestFilter);
+		List<Selection<? extends Object>> aggregationFields = this.queryBuilder.getAggregateSelection(root, criteriaBuilder, entityClass, requestFilter);
 		
 		if (aggregationFields.isEmpty()) {
 			throw new BadRequestApiException(String.format(MSGERROR.INVALID_AGGREGATION_ERROR, requestFilter));
@@ -175,26 +178,26 @@ public class ApiRepository<E extends BaseEntity> {
 		
 		query.multiselect(aggregationFields.toArray(new Selection[]{}));
 		
-		List<Predicate> restrictions = this.apiQueryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
+		List<Predicate> restrictions = this.queryBuilder.getRestrictions(entityClass, requestFilter, criteriaBuilder, root); 
 		
 		if (!restrictions.isEmpty()) {
 			query.where(restrictions.toArray(new Predicate[]{}));
 		}
 		
-		List<Order> orders = this.apiQueryBuilder.getOrders(requestFilter, criteriaBuilder, root, entityClass);
+		List<Order> orders = this.queryBuilder.getOrders(requestFilter, criteriaBuilder, root, entityClass);
 		
 		if (!orders.isEmpty()) {
 			query.orderBy(orders);
 		}
 		
-		List<Selection<? extends Object>> groupBy = this.apiQueryBuilder.getGroupByFields(requestFilter, root, entityClass);
+		List<Selection<? extends Object>> groupBy = this.queryBuilder.getGroupByFields(requestFilter, root, entityClass);
 		query.groupBy(groupBy.toArray(new Expression[]{}));
 		
 		try {
 		    List<Object> result = this.entityManager.createQuery(query)
 		    		.getResultList();
 		    
-		    return this.apiResultMapper.mapResultSet(entityClass, result, aggregationFields);
+		    return this.resultMapper.mapResultSet(entityClass, result, aggregationFields);
 		    
 		} catch (NoResultException e) {
 			throw new NotFoundApiException(String.format(MSGERROR.ENTITIES_NOT_FOUND_ERROR, requestFilter), e);
