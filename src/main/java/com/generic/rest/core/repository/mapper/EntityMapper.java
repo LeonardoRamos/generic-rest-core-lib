@@ -19,6 +19,7 @@ import org.hibernate.query.sqm.tree.expression.SqmDistinct;
 
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.domain.filter.AggregateFunction;
+import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.util.ReflectionUtils;
 
 import jakarta.persistence.criteria.Path;
@@ -44,7 +45,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	 * @return E
 	 * @throws ReflectiveOperationException
 	 */
-	E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws ReflectiveOperationException;
+	E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException;
 	
 	/**
 	 * Map the projection returned from JPA query into entity <E> fields and aggregation fields.
@@ -293,7 +294,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	 * @throws IllegalAccessException
 	 */
 	private void setFieldValue(Object fieldDataValue, Object object, Field field) 
-			throws IllegalArgumentException, IllegalAccessException {
+			throws ReflectiveOperationException {
 		
 		if (Collection.class.isAssignableFrom(field.getType())) {
 			Collection collection = (Collection) field.get(object);

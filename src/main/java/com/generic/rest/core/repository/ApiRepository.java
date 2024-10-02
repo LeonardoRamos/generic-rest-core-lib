@@ -10,6 +10,7 @@ import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.domain.filter.RequestFilter;
 import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.exception.InternalErrorApiException;
+import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.mapper.ResultMapper;
 import com.generic.rest.core.repository.mapper.impl.ApiResultMapper;
@@ -202,7 +203,7 @@ public class ApiRepository<E extends BaseEntity> {
 		} catch (NoResultException e) {
 			throw new NotFoundApiException(String.format(MSGERROR.ENTITIES_NOT_FOUND_ERROR, requestFilter), e);
 		
-		} catch (PersistenceException | ReflectiveOperationException e) {
+		} catch (PersistenceException | MapperException e) {
 			throw new BadRequestApiException(String.format(MSGERROR.BAD_REQUEST_ERROR, requestFilter), e);
 			
 		} catch (Exception e) {

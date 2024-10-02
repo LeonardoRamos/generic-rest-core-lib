@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.UnauthorizedApiException;
-import com.generic.rest.core.service.impl.TokenService;
+import com.generic.rest.core.service.impl.TokenServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 	private boolean authDisabled;
 	
 	@Autowired
-	private TokenService tokenService;
+	private TokenServiceImpl tokenService;
 	
 	/**
 	 * {@inheritDoc}

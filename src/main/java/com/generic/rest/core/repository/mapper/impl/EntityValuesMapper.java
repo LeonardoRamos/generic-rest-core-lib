@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import com.generic.rest.core.domain.BaseEntity;
+import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.repository.mapper.EntityMapper;
 
 import jakarta.persistence.criteria.Selection;
@@ -25,13 +26,19 @@ public class EntityValuesMapper<E extends BaseEntity> implements EntityMapper<E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws ReflectiveOperationException {
-		Constructor<?> constructor = entityClass.getConstructor();
-		E object = (E) constructor.newInstance();
+	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException {
+		try {
+			Constructor<?> constructor = entityClass.getConstructor();
+			E object = (E) constructor.newInstance();
+			
+			this.mapProjectionPath(entityClass, projection, row, object, ROOT_PROJECTION_FIELD);
+			
+			return object;
+			
+		} catch (ReflectiveOperationException e) {
+			throw new MapperException(e);
+		} 
 		
-		this.mapProjectionPath(entityClass, projection, row, object, ROOT_PROJECTION_FIELD);
-		
-		return object;
 	}
 
 }

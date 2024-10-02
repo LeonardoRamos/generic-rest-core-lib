@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import com.generic.rest.core.domain.BaseEntity;
+import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.repository.mapper.EntityMapper;
 
 import jakarta.persistence.criteria.Selection;
@@ -24,25 +25,31 @@ public class EntityObjectMapper<E extends BaseEntity> implements EntityMapper<E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws ReflectiveOperationException {
-		E entity = (E) row;
-		
-		if (projection == null || projection.isEmpty()) {
-			return entity;
-		}
-		
-		Constructor<?> constructor = entityClass.getConstructor();
-		E object = (E) constructor.newInstance();
-		
-		for (Field field : entityClass.getDeclaredFields()) {
-		    field.setAccessible(true);
-		    
-			if (this.isInProjection(field.getName(), projection)) {
-				field.set(object, field.get(entity));
+	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException {
+		try {
+			
+			E entity = (E) row;
+			
+			if (projection == null || projection.isEmpty()) {
+				return entity;
 			}
+			
+			Constructor<?> constructor = entityClass.getConstructor();
+			E object = (E) constructor.newInstance();
+			
+			for (Field field : entityClass.getDeclaredFields()) {
+				field.setAccessible(true);
+				
+				if (this.isInProjection(field.getName(), projection)) {
+					field.set(object, field.get(entity));
+				}
+			}
+			
+			return object;
+			
+		} catch (ReflectiveOperationException e) {
+			throw new MapperException(e);
 		}
-		
-		return object;
 	}
 	
 	/**

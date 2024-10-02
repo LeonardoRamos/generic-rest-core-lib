@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.generic.rest.core.domain.BaseEntity;
+import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.repository.mapper.EntityMapper;
 import com.generic.rest.core.repository.mapper.ResultMapper;
 
@@ -26,7 +27,7 @@ public class ApiResultMapper<E extends BaseEntity> implements ResultMapper<E> {
 	public List<E> mapResultSet(
 			Class<E> entityClass, 
 			List<Object> result, 
-			List<Selection<? extends Object>> projection) throws ReflectiveOperationException {
+			List<Selection<? extends Object>> projection) throws MapperException {
 		
 		List<E> entities = new ArrayList<>();
 		
