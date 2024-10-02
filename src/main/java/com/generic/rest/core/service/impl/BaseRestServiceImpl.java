@@ -1,5 +1,7 @@
 package com.generic.rest.core.service.impl;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.exception.ApiException;
@@ -44,6 +46,7 @@ public abstract class BaseRestServiceImpl<E extends BaseEntity, R extends BaseRe
 	 * @throws ApiException
 	 */
 	@Override
+	@Transactional
 	public E update(Object id, E entity) throws ApiException {
 		Long idLong = null;
 		
@@ -64,6 +67,7 @@ public abstract class BaseRestServiceImpl<E extends BaseEntity, R extends BaseRe
 	 * @return Number of deleted entities.
 	 * @throws ApiException
 	 */
+	@Transactional
 	public boolean delete(Long id) throws ApiException {
 		this.validateExists(id);
 		
@@ -76,10 +80,11 @@ public abstract class BaseRestServiceImpl<E extends BaseEntity, R extends BaseRe
 	 * Save entity based on {@link BaseEntity}.
 	 * 
 	 * @param E
-	 * @return Updated entity.
+	 * @return saved entity.
 	 * @throws ApiException
 	 */
 	@Override
+	@Transactional
    	public E save(E entity) throws ApiException {
 	   	return this.getRepository().saveAndFlush(entity);
    	}

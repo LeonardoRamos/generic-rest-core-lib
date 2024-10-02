@@ -8,6 +8,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.ApiMetadata;
@@ -107,6 +108,7 @@ public abstract class ApiRestServiceImpl<E extends BaseEntity, R extends BaseRep
 	 *
 	 * @param entities to be deleted..
 	 */
+	@Transactional
    	public void deleteInBatch(List<E> entities) {
    		this.getRepository().deleteAllInBatch(entities);
    	}
@@ -119,6 +121,7 @@ public abstract class ApiRestServiceImpl<E extends BaseEntity, R extends BaseRep
    	 * @return Updated entity.
    	 * @throws ApiException
    	 */
+	@Transactional
 	public E update(Long id, E entity) throws ApiException {
 		if (entity.getId() == null || id == null || !entity.getId().equals(id)) {
 			throw new BadRequestApiException(String.format(MSGERROR.BAD_REQUEST_ERROR, id));

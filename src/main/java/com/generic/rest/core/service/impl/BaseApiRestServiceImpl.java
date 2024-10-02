@@ -2,6 +2,8 @@ package com.generic.rest.core.service.impl;
 
 import java.util.Calendar;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.BaseApiEntity;
 import com.generic.rest.core.exception.ApiException;
@@ -52,6 +54,7 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional
 	public E update(Object id, E entity) throws ApiException {
 		if (entity.getExternalId() == null || id == null || !entity.getExternalId().equals(id.toString())) {
 			throw new BadRequestApiException(String.format(MSGERROR.BAD_REQUEST_ERROR, id));
@@ -68,6 +71,7 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 	 * @return Updated entity.
 	 * @throws ApiException
 	 */
+	@Transactional
 	public E update(String externalId, E entity) throws ApiException {
 		if (entity.getExternalId() == null || externalId == null || !entity.getExternalId().equals(externalId)) {
 			throw new BadRequestApiException(String.format(MSGERROR.BAD_REQUEST_ERROR, externalId));
@@ -94,6 +98,7 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 	 * @return Number of deleted entities.
 	 * @throws ApiException
 	 */
+	@Transactional
 	public Integer delete(String externalId) throws ApiException {
 	   	Integer deletedCount = this.getRepository().deleteByExternalId(externalId);
 	   
@@ -112,6 +117,7 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 	 * @throws ApiException
 	 */
 	@Override
+	@Transactional
    	public E save(E entity) throws ApiException {
    		if (entity.getExternalId() == null || "".equals(entity.getExternalId())) {
    			entity.setExternalId(getExternalIdGenerator().get());
