@@ -21,7 +21,7 @@ import com.generic.rest.core.exception.BadRequestApiException;
 import com.generic.rest.core.exception.NotFoundApiException;
 import com.generic.rest.core.repository.UserRepository;
 import com.generic.rest.core.service.impl.BaseApiRestServiceImpl;
-import com.generic.rest.core.service.impl.TokenService;
+import com.generic.rest.core.service.impl.TokenServiceImpl;
 import com.generic.rest.core.util.encrypter.impl.BCryptTextEncrypter;
 
 @Service
@@ -34,7 +34,7 @@ public class UserService extends BaseApiRestServiceImpl<User, UserRepository> im
 	private AddressService addressService;
 	
 	@Autowired
-	private TokenService tokenService;
+	private TokenServiceImpl tokenService;
 	
 	private BCryptTextEncrypter passwordEncrypter = new BCryptTextEncrypter();
 	
