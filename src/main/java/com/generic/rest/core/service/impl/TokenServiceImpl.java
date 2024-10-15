@@ -154,7 +154,7 @@ public class TokenServiceImpl implements TokenService {
 			List<String> authorizationHeaderData = StringParserUtils.splitStringList(authorizationHeader, ' ');
 			
 			if (authorizationHeaderData != null && authorizationHeaderData.size() > 1 && 
-					authorizationHeaderData.get(0).equals(JWTAUTH.BEARER)) {
+					authorizationHeaderData.getFirst().equals(JWTAUTH.BEARER)) {
 				
 				return authorizationHeaderData.get(1);
 			}
