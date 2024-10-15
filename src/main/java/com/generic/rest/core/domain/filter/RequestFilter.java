@@ -15,6 +15,10 @@ import io.micrometer.common.util.StringUtils;
  */
 public class RequestFilter {
 	
+	public static final Integer DEFAULT_OFFSET = 0;
+	public static final Integer DEFAULT_LIMIT = 20;
+	public static final Integer MAX_LIMIT = 100;
+
 	private String filter;
 	private String projection;
 	private String sum;
@@ -25,9 +29,6 @@ public class RequestFilter {
 	private String sort; 
 	private String offset;
 	private String limit;
-	public static final Integer DEFAULT_OFFSET = 0;
-	public static final Integer DEFAULT_LIMIT = 20;
-	public static final Integer MAX_LIMIT = 100;
 	
 	/**
 	 * Normalize parameter removing special characters '[' and ']'.

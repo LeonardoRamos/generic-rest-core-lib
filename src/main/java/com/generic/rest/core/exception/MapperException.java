@@ -8,6 +8,8 @@ package com.generic.rest.core.exception;
  */
 public class MapperException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor.
      */
@@ -42,7 +44,5 @@ public class MapperException extends RuntimeException {
     public MapperException(Throwable cause) {
         super(cause);
     }
-
-	private static final long serialVersionUID = 1L;
 
 }

@@ -90,7 +90,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	 * @return {@link SqmBasicValuedSimplePath}
 	 */
 	private SqmBasicValuedSimplePath<Object> getAggregationPath(SelfRenderingSqmAggregateFunction aggregationFunction) {
-		Object aggregationData = aggregationFunction.getArguments().get(0);
+		Object aggregationData = aggregationFunction.getArguments().getFirst();
 
 		if (aggregationData instanceof SqmBasicValuedSimplePath) {
 			return (SqmBasicValuedSimplePath<Object>) aggregationData;
