@@ -5,7 +5,7 @@ Lib for API Rest developed using *Java*. Its purpose is to serve as a lib to mak
 
 ## Setting up
 
-Import the dependency on your project. POC example https://github.com/LeonardoRamos/java-generic-rest-api.
+Import the dependency in your project. POC example https://github.com/LeonardoRamos/java-generic-rest-api.
 
 ```xml
 <dependency>
