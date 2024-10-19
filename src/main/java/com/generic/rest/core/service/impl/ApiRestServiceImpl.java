@@ -146,6 +146,18 @@ public abstract class ApiRestServiceImpl<E extends BaseEntity, R extends BaseRep
 		}
 	}
 	
+	/**
+	 * Validate if entity is null.
+	 * 
+	 * @param entity
+	 * @throws NotFoundApiException
+	 */
+	public void validateEntity(E entity) {
+		if (entity == null) {
+			throw new NotFoundApiException(MSGERROR.ENTITY_NULL_ERROR);
+		}
+	}
+	
    	/**
    	 * Update entity.
    	 * 
