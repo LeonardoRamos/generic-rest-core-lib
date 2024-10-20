@@ -179,6 +179,7 @@ public final class BaseConstants {
 		public static final String ENTITIES_NOT_FOUND_ERROR = "No entities found for requestFilter [%s]";
 		public static final String BAD_REQUEST_ERROR = "Malformed request for requestFilter [%s]";
 		public static final String ENTITY_NOT_FOUND_ERROR = "No entity found for externalId [%s]";
+		public static final String ENTITY_NULL_ERROR = "No entity found or null entity";
 		public static final String BASE_ENTITY_NOT_FOUND_ERROR = "No entity found for id [%s]";
 		public static final String PARSE_PROJECTIONS_ERROR = "Error parsing projections of filter [%s]";
 		public static final String PARSE_FILTER_FIELDS_ERROR = "Error parsing filter fields of filter [%s]";
