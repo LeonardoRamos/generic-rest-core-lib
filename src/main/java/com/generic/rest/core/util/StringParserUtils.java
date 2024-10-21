@@ -90,16 +90,16 @@ public class StringParserUtils {
 	 * 
 	 * @param source
 	 * @param originalString
-	 * @param newString
+	 * @param newToReplace
 	 * @return string with replaced values
 	 */
-	public static String replace(String source, String[] originalStrings, String newString) {
+	public static String replace(String source, String[] toBeReplaced, String newToReplace) {
 	    if (source == null) {
 	        return null;
 	    }
 	    
-	    for (int k = 0; k < originalStrings.length; k++) {
-	    	source = replace(source, originalStrings[k], newString); 
+	    for (int k = 0; k < toBeReplaced.length; k++) {
+	    	source = replace(source, toBeReplaced[k], newToReplace); 
 	    }
 	    
 	    return source;
