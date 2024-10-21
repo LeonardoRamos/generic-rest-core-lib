@@ -48,30 +48,30 @@ public class StringParserUtils {
 	}
 	
 	/**
-	 * Replace a fragment of a string with a given ne fragment.
+	 * Replace a fragment of a string with a given new fragment.
 	 * 
 	 * @param source
-	 * @param originalString
-	 * @param newString
-	 * @return string with repaced value
+	 * @param toBeReplaced
+	 * @param newToReplace
+	 * @return string with replaced value
 	 */
-	public static String replace(String source, String originalString, String newString) {
+	public static String replace(String source, String toBeReplaced, String newToReplace) {
 	    if (source == null) {
 	        return null;
 	    }
 	    
 	    int i = 0;
-	    if ((i = source.indexOf(originalString, i)) >= 0) {
+	    if ((i = source.indexOf(toBeReplaced, i)) >= 0) {
 	        char[] sourceArray = source.toCharArray();
-	        char[] nsArray = newString.toCharArray();
-	        int oLength = originalString.length();
+	        char[] nsArray = newToReplace.toCharArray();
+	        int oLength = toBeReplaced.length();
 
 	        StringBuilder buf = new StringBuilder(sourceArray.length);
 	        buf.append(sourceArray, 0, i).append(nsArray);
 	        i += oLength;
 	        int j = i;
 	        
-	        while ((i = source.indexOf(originalString, i)) > 0) {
+	        while ((i = source.indexOf(toBeReplaced, i)) > 0) {
 	            buf.append(sourceArray, j, i - j).append(nsArray);
 	            i += oLength;
 	            j = i;
@@ -86,20 +86,20 @@ public class StringParserUtils {
 	}
 
 	/**
-	 * Replace fragments of a string with a given ne fragment.
+	 * Replace fragments of a string with a given new fragment.
 	 * 
 	 * @param source
 	 * @param originalString
-	 * @param newString
-	 * @return string with repaced values
+	 * @param newToReplace
+	 * @return string with replaced values
 	 */
-	public static String replace(String source, String[] originalStrings, String newString) {
+	public static String replace(String source, String[] toBeReplaced, String newToReplace) {
 	    if (source == null) {
 	        return null;
 	    }
 	    
-	    for (int k = 0; k < originalStrings.length; k++) {
-	    	source = replace(source, originalStrings[k], newString); 
+	    for (int k = 0; k < toBeReplaced.length; k++) {
+	    	source = replace(source, toBeReplaced[k], newToReplace); 
 	    }
 	    
 	    return source;
