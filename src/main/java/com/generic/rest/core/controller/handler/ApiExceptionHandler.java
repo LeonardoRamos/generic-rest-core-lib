@@ -1,11 +1,13 @@
 
-package com.generic.rest.core.controller.advice;
+package com.generic.rest.core.controller.handler;
 
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -28,22 +30,23 @@ import com.generic.rest.core.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Exception handler advice to handle exception and fomat error response.
+ * Exception handler advice to handle exception and format error response.
  * 
  * @author leonardo.ramos
  *
  */
 @RestControllerAdvice
-public class ExceptionHandlerControllerAdvice {
+@Order(Ordered.LOWEST_PRECEDENCE)
+public class ApiExceptionHandler {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionHandlerControllerAdvice.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-	private ErrorParser errorParser;
+	protected ErrorParser errorParser;
 	
 	/**
 	 * Default constructor.
 	 */
-	public ExceptionHandlerControllerAdvice() {
+	public ApiExceptionHandler() {
 		this.errorParser = new ErrorParser();
 	}
 	
@@ -122,7 +125,7 @@ public class ExceptionHandlerControllerAdvice {
 			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.PARAMETER_NOT_PRESENT, missingServletRequestPartException.getRequestPartName()), status);
 		}
 		
-		return handleFormatExceptions(exception, status);
+		return this.handleFormatExceptions(exception, status);
 	}
 
 	/**
