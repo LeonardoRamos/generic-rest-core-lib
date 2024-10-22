@@ -41,7 +41,7 @@ public class ApiExceptionHandler {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-	protected ErrorParser errorParser;
+	private ErrorParser errorParser;
 	
 	/**
 	 * Default constructor.
