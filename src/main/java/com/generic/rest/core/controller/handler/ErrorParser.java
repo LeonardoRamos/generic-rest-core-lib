@@ -1,4 +1,4 @@
-package com.generic.rest.core.controller.advice;
+package com.generic.rest.core.controller.handler;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
