@@ -31,49 +31,6 @@ public class RequestFilter {
 	private String limit;
 	
 	/**
-	 * Normalize parameter removing special characters '[' and ']'.
-	 * 
-	 * @param symbol
-	 * @return normalized param
-	 */
-	private String normalizeParam(String symbol) {
-		if (symbol != null) {
-			symbol = StringParserUtils.replace(symbol, new String[]{"[", "]"}, "");
-		}
-		
-		return symbol;
-	}
-
-	/**
-	 * Normalize and parse the operators of a given text filter. </p>
-	 * Parse simple char Operators like '<', '>' and '=' for later because this special characters are within other operators like '>=' for example
-
-	 * 
-	 * @param filter
-	 * @return parsed and normalized filter operator text
-	 */
-	private String parseFilterOperators(String filter) {
-		FilterOperator[] operators = new FilterOperator[] { FilterOperator.EQ, FilterOperator.GT, FilterOperator.LT };
-		List<FilterOperator> simpleCharOperator = Arrays.asList(operators);
-		
-		for (FilterOperator filterOperator : FilterOperator.values()) {
-			if (!simpleCharOperator.contains(filterOperator)) {
-				filter = StringParserUtils.replace(filter, 
-						new String[] { filterOperator.getOperatorCommonAlias(), filterOperator.getOperatorAlias() }, 
-						filterOperator.getParseableOperator());
-			}
-		}
-		
-		for (FilterOperator simpleCharfilterOperator : simpleCharOperator) {
-			filter = StringParserUtils.replace(filter, 
-					new String[] { simpleCharfilterOperator.getOperatorCommonAlias(), simpleCharfilterOperator.getOperatorAlias() }, 
-					simpleCharfilterOperator.getParseableOperator());
-		}
-		
-		return filter;
-	}
-	
-	/**
 	 * Add {@link LogicOperator#AND} operator in query filter.
 	 * 
 	 * @param filterName
@@ -367,6 +324,35 @@ public class RequestFilter {
 		}
 		this.filter = filter;
 	}
+	
+	/**
+	 * Normalize and parse the operators of a given text filter. </p>
+	 * Parse simple char Operators like '<', '>' and '=' for later because this special characters are within other operators like '>=' for example
+
+	 * 
+	 * @param filter
+	 * @return parsed and normalized filter operator text
+	 */
+	private String parseFilterOperators(String filter) {
+		FilterOperator[] operators = new FilterOperator[] { FilterOperator.EQ, FilterOperator.GT, FilterOperator.LT };
+		List<FilterOperator> simpleCharOperator = Arrays.asList(operators);
+		
+		for (FilterOperator filterOperator : FilterOperator.values()) {
+			if (!simpleCharOperator.contains(filterOperator)) {
+				filter = StringParserUtils.replace(filter, 
+						new String[] { filterOperator.getOperatorCommonAlias(), filterOperator.getOperatorAlias() }, 
+						filterOperator.getParseableOperator());
+			}
+		}
+		
+		for (FilterOperator simpleCharfilterOperator : simpleCharOperator) {
+			filter = StringParserUtils.replace(filter, 
+					new String[] { simpleCharfilterOperator.getOperatorCommonAlias(), simpleCharfilterOperator.getOperatorAlias() }, 
+					simpleCharfilterOperator.getParseableOperator());
+		}
+		
+		return filter;
+	}
 
 	/**
 	 * Return the projection.
@@ -599,6 +585,20 @@ public class RequestFilter {
 			countDistinct = this.normalizeParam(countDistinct);
 		}
 		this.countDistinct = countDistinct;
+	}
+	
+	/**
+	 * Normalize parameter removing special characters '[' and ']'.
+	 * 
+	 * @param symbol
+	 * @return normalized param
+	 */
+	private String normalizeParam(String symbol) {
+		if (symbol != null) {
+			symbol = StringParserUtils.replace(symbol, new String[]{"[", "]"}, "");
+		}
+		
+		return symbol;
 	}
 	
 	/**

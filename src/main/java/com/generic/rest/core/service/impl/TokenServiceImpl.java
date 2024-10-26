@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.AuthEntity;
+import com.generic.rest.core.service.TokenService;
 import com.generic.rest.core.util.StringParserUtils;
 
 import io.jsonwebtoken.Claims;
