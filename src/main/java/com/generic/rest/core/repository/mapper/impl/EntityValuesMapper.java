@@ -38,7 +38,6 @@ public class EntityValuesMapper<E extends BaseEntity> implements EntityMapper<E>
 		} catch (ReflectiveOperationException e) {
 			throw new MapperException(e);
 		} 
-		
 	}
 
 }

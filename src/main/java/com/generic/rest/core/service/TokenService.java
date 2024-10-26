@@ -1,4 +1,4 @@
-package com.generic.rest.core.service.impl;
+package com.generic.rest.core.service;
 
 import com.generic.rest.core.domain.AuthEntity;
 
