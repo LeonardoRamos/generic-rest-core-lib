@@ -196,6 +196,7 @@ public class ApiExceptionHandler {
 				path.append(reference.getFieldName());
 			}
 		}
+		
 		return path;
 	}
     
