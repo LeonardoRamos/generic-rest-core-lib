@@ -11,6 +11,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.generic.rest.core.BaseConstants;
 
+import io.micrometer.common.util.StringUtils;
+
 /**
  * Utility class for reflection based operations.
  * 
@@ -56,7 +58,7 @@ public class ReflectionUtils {
 	 * @throws IOException
 	 */
 	public static Object getTypifiedValue(String value, Class<?> clazz) throws IOException {
-		if (value != null && !"".equals(value)) {
+		if (StringUtils.isNotBlank(value)) {
 			if (clazz.equals(Long.class)) {
 				return Double.valueOf(value).longValue();
 			
