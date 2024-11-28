@@ -26,7 +26,7 @@ public class EntityValuesMapper<E extends BaseEntity> implements EntityMapper<E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException {
+	public <X extends Object> E mapEntity(Class<E> entityClass, Object row, List<Selection<X>> projection) throws MapperException {
 		try {
 			Constructor<?> constructor = entityClass.getConstructor();
 			E object = (E) constructor.newInstance();

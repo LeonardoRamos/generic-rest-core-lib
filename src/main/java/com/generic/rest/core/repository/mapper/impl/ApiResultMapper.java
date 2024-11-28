@@ -24,10 +24,10 @@ public class ApiResultMapper<E extends BaseEntity> implements ResultMapper<E> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<E> mapResultSet(
+	public <X extends Object> List<E> mapResultSet(
 			Class<E> entityClass, 
 			List<Object> result, 
-			List<Selection<? extends Object>> projection) throws MapperException {
+			List<Selection<X>> projection) throws MapperException {
 		
 		List<E> entities = new ArrayList<>();
 		

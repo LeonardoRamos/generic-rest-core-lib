@@ -150,5 +150,26 @@ public class ReflectionUtils {
 		}
 		return CalendarUtils.createCalendarFromString(value, BaseConstants.DEFAULT_DATE_FORMAT);
 	}
+
+	/**
+	 * Make field accessible.
+	 * 
+	 * @param field
+	 */
+	public static void makeAccessible(Field field) {
+		org.springframework.util.ReflectionUtils.makeAccessible(field);
+		
+	}
+
+	/**
+	 * Set field value in a given object.
+	 * 
+	 * @param field
+	 * @param target
+	 * @param value
+	 */
+	public static  void setField(Field field, Object target, Object value) {
+		org.springframework.util.ReflectionUtils.setField(field, target, value);
+	}
 	
 }

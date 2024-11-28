@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.generic.rest.core.ApiConstants;
 import com.generic.rest.core.ApiConstants.CONTROLLER.LOGIN;
@@ -62,7 +61,7 @@ class BaseApiRestControllerTest {
 	List<User> usersDatabase;
      
 	@BeforeEach
-	void setup() throws JsonProcessingException, Exception {
+	void setup() throws Exception {
 		SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 		objectMapper.setDateFormat(dt);
 		
@@ -410,7 +409,9 @@ class BaseApiRestControllerTest {
 		for (int i = 0; i < usersDatabase.size(); i++) {
 			try {
 				userService.delete(usersDatabase.get(i).getExternalId());
-			} catch (NotFoundApiException e) {}
+			} catch (NotFoundApiException e) {
+				// NOSONAR
+			}
     		 
 		}
 	}

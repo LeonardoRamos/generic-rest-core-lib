@@ -45,7 +45,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	 * @return E
 	 * @throws ReflectiveOperationException
 	 */
-	E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException;
+	<X extends Object> E mapEntity(Class<E> entityClass, Object row, List<Selection<X>> projection) throws MapperException;
 	
 	/**
 	 * Map the projection returned from JPA query into entity <E> fields and aggregation fields.
@@ -57,12 +57,11 @@ public interface EntityMapper<E extends BaseEntity> {
 	 * @param projectionIndex
 	 * @throws ReflectiveOperationException
 	 */
-	default void mapProjectionPath(Class<E> entityClass, List<Selection<? extends Object>>  projection, 
+	default <X extends Object> void mapProjectionPath(Class<E> entityClass, List<Selection<X>>  projection, 
 			Object row, E object, int projectionIndex) throws ReflectiveOperationException {
 		
-		if (projection != null && projection.get(projectionIndex) instanceof SelfRenderingSqmAggregateFunction) {
+		if (projection != null && projection.get(projectionIndex) instanceof SelfRenderingSqmAggregateFunction aggregationFunction) {
 			
-			SelfRenderingSqmAggregateFunction aggregationFunction = (SelfRenderingSqmAggregateFunction) projection.get(projectionIndex);
 			SqmBasicValuedSimplePath<Object> attributePath = this.getAggregationPath(aggregationFunction);
 			
 			if (AggregateFunction.isCountFunction(aggregationFunction.getFunctionName()) ||
@@ -154,7 +153,7 @@ public interface EntityMapper<E extends BaseEntity> {
 		} else {
 			Object rootFieldData = rootFieldEntry.getValue().getConstructor().newInstance();
 			Field fieldRoot = ReflectionUtils.getEntityFieldByName(entityClass, rootFieldEntry.getKey());
-			fieldRoot.setAccessible(true);
+			ReflectionUtils.makeAccessible(fieldRoot);
 			
 			Object currentData = rootFieldData;
 			
@@ -168,7 +167,7 @@ public interface EntityMapper<E extends BaseEntity> {
 				} else {
 					Object currentFieldData = fieldEntry.getValue().getConstructor().newInstance();
 					Field currentField = ReflectionUtils.getEntityFieldByName(currentData.getClass(), fieldEntry.getKey());
-					currentField.setAccessible(true);
+					ReflectionUtils.makeAccessible(currentField);
 					
 					this.setFieldValue(currentFieldData, currentData, currentField);
 				
@@ -196,7 +195,7 @@ public interface EntityMapper<E extends BaseEntity> {
 			Map.Entry<String, Class> fieldEntry = fieldPaths.get(i).entrySet().iterator().next();
 			
 			Field currentEntityField = ReflectionUtils.getEntityFieldByName(currentObject.getClass(), fieldEntry.getKey());
-			currentEntityField.setAccessible(true);
+			ReflectionUtils.makeAccessible(currentEntityField);
 			Object currentEntityData = currentEntityField.get(currentObject);
 			
 			if (currentEntityData == null) {
@@ -210,7 +209,7 @@ public interface EntityMapper<E extends BaseEntity> {
 					Map.Entry<String, Class> projectionEntry = fieldPaths.get(i - 1).entrySet().iterator().next();
 
 					Field currentProjectionField = ReflectionUtils.getEntityFieldByName(currentProjectionObject.getClass(), projectionEntry.getKey());
-					currentProjectionField.setAccessible(true);
+					ReflectionUtils.makeAccessible(currentProjectionField);
 					Object currentProjectionData = currentProjectionField.get(currentProjectionObject);
 					
 					currentProjectionObject = currentProjectionData;
@@ -232,7 +231,7 @@ public interface EntityMapper<E extends BaseEntity> {
 			throws ReflectiveOperationException {
 		
 		Field fieldRoot = ReflectionUtils.getEntityFieldByName(clazz, fieldEntry.getKey());
-		fieldRoot.setAccessible(true);
+		ReflectionUtils.makeAccessible(fieldRoot);
 		this.setFieldValue(fieldData, object, fieldRoot);
 	}
 	
@@ -313,10 +312,10 @@ public interface EntityMapper<E extends BaseEntity> {
 			}
 			
 			collection.add(fieldDataValue);
-			field.set(object, collection);
+			ReflectionUtils.setField(field, object, collection);
 			
 		} else {
-			field.set(object, fieldDataValue);
+			ReflectionUtils.setField(field, object, fieldDataValue);
 		}
 	}
 	

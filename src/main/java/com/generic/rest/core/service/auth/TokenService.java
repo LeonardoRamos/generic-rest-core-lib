@@ -1,4 +1,4 @@
-package com.generic.rest.core.service;
+package com.generic.rest.core.service.auth;
 
 import com.generic.rest.core.domain.AuthEntity;
 
@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author leonardo.ramos
  *
  */
-public interface TokenService {
+public sealed interface TokenService permits TokenServiceImpl {
 
 	/**
 	 * Generate token with given authentication data.

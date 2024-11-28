@@ -101,28 +101,24 @@ public class ApiExceptionHandler {
 
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		if (exception instanceof MethodArgumentNotValidException) {
-			MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) exception;
-			return this.handler(exception, this.errorParser.formatErrorList(methodArgumentNotValidException.getBindingResult()), status);
+		if (exception instanceof MethodArgumentNotValidException except) {
+			return this.handler(exception, this.errorParser.formatErrorList(except.getBindingResult()), status);
 		}
 
 		if (exception instanceof HttpMediaTypeNotSupportedException) {
 			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.MEDIA_TYPE_NOT_SUPPORTED), status);
 		}
 		
-		if (exception instanceof HttpRequestMethodNotSupportedException) {
-			HttpRequestMethodNotSupportedException httpRequestMethodNotSupportedException = (HttpRequestMethodNotSupportedException) exception;
-			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.METHOD_NOT_SUPPORTED, httpRequestMethodNotSupportedException.getMethod()), status);
+		if (exception instanceof HttpRequestMethodNotSupportedException except) {
+			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.METHOD_NOT_SUPPORTED, except.getMethod()), status);
 		
 		}
-		if (exception instanceof HttpMediaTypeNotAcceptableException) {
-			HttpMediaTypeNotAcceptableException httpMediaTypeNotAcceptableException = (HttpMediaTypeNotAcceptableException) exception;
-			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.MEDIA_TYPE_NOT_ACCEPTABLE, httpMediaTypeNotAcceptableException.getSupportedMediaTypes().toString()), status);
+		if (exception instanceof HttpMediaTypeNotAcceptableException except) {
+			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.MEDIA_TYPE_NOT_ACCEPTABLE, except.getSupportedMediaTypes().toString()), status);
 		}
 
-		if (exception instanceof MissingServletRequestPartException) {
-			MissingServletRequestPartException missingServletRequestPartException = (MissingServletRequestPartException) exception;
-			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.PARAMETER_NOT_PRESENT, missingServletRequestPartException.getRequestPartName()), status);
+		if (exception instanceof MissingServletRequestPartException except) {
+			return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.PARAMETER_NOT_PRESENT, except.getRequestPartName()), status);
 		}
 		
 		return this.handleFormatExceptions(exception, status);
@@ -139,9 +135,8 @@ public class ApiExceptionHandler {
 	private ResponseEntity<Map<String, Object>> handleFormatExceptions(Exception exception, HttpStatus status) {
 		if (exception instanceof HttpMessageNotReadableException) {
 
-			if (exception.getCause() instanceof UnrecognizedPropertyException) {
-				UnrecognizedPropertyException ex = ((UnrecognizedPropertyException) exception.getCause());
-				return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.UNRECOGNIZED_FIELD, ex.getPropertyName()), status);
+			if (exception.getCause() instanceof UnrecognizedPropertyException except) {
+				return this.handler(exception, this.errorParser.formatErrorList(MSGERROR.UNRECOGNIZED_FIELD, except.getPropertyName()), status);
 
 			} else if (exception.getCause() instanceof InvalidFormatException) {
 				StringBuilder path = buildFormatErrorPath(exception);

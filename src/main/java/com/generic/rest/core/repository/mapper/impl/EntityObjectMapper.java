@@ -7,6 +7,7 @@ import java.util.List;
 import com.generic.rest.core.domain.BaseEntity;
 import com.generic.rest.core.exception.MapperException;
 import com.generic.rest.core.repository.mapper.EntityMapper;
+import com.generic.rest.core.util.ReflectionUtils;
 
 import jakarta.persistence.criteria.Selection;
 
@@ -25,7 +26,7 @@ public class EntityObjectMapper<E extends BaseEntity> implements EntityMapper<E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException {
+	public <X extends Object> E mapEntity(Class<E> entityClass, Object row, List<Selection<X>> projection) throws MapperException {
 		try {
 			
 			E entity = (E) row;
@@ -38,10 +39,10 @@ public class EntityObjectMapper<E extends BaseEntity> implements EntityMapper<E>
 			E object = (E) constructor.newInstance();
 			
 			for (Field field : entityClass.getDeclaredFields()) {
-				field.setAccessible(true);
+				ReflectionUtils.makeAccessible(field);
 				
 				if (this.isInProjection(field.getName(), projection)) {
-					field.set(object, field.get(entity));
+					ReflectionUtils.setField(field, object, field.get(entity));
 				}
 			}
 			
@@ -59,7 +60,7 @@ public class EntityObjectMapper<E extends BaseEntity> implements EntityMapper<E>
 	 * @param projection
 	 * @return true if fieldName is in projection false otherwise
 	 */
-	private boolean isInProjection(String fieldName, List<Selection<? extends Object>> projection) {
+	private <X extends Object> boolean isInProjection(String fieldName, List<Selection<X>> projection) {
 		if (projection == null || projection.isEmpty()) {
 			return false;
 		}
