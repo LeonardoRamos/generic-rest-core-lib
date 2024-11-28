@@ -24,7 +24,7 @@ public class EntityObjectValuesArrayMapper<E extends BaseEntity> implements Enti
 	 * {@inheritDoc}
 	 */
 	@Override
-	public E mapEntity(Class<E> entityClass, Object row, List<Selection<? extends Object>> projection) throws MapperException {
+	public <X extends Object> E mapEntity(Class<E> entityClass, Object row, List<Selection<X>> projection) throws MapperException {
 		try {
 			Object[] fieldData = (Object[]) row;
 			

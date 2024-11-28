@@ -59,10 +59,10 @@ public class ErrorParser {
 			for (ObjectError objectError: bindingResult.getAllErrors()) {
 				if (objectError.getDefaultMessage() != null) {
 					
-					if (objectError instanceof FieldError) {
-						String fieldError = ((FieldError) objectError).getField();
+					if (objectError instanceof FieldError fieldError) {
+						String field = fieldError.getField();
 						
-						code = new StringBuilder(code).append("_").append(fieldError).toString().toUpperCase();
+						code = new StringBuilder(code).append("_").append(field).toString().toUpperCase();
 					}
 					
 					message = objectError.getDefaultMessage();

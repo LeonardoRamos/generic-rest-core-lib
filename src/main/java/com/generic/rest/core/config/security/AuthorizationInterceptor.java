@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.exception.UnauthorizedApiException;
-import com.generic.rest.core.service.impl.TokenServiceImpl;
+import com.generic.rest.core.service.auth.TokenServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,10 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
-	@Value(JWTAUTH.AUTH_DISABLED)
 	private boolean authDisabled;
-	
-	@Autowired
 	private TokenServiceImpl tokenService;
 	
 	/**
@@ -35,9 +32,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object objectHandler) {
-		if (!this.authDisabled && objectHandler instanceof HandlerMethod) {
-			
-			HandlerMethod handler = (HandlerMethod) objectHandler;
+		if (!this.authDisabled && objectHandler instanceof HandlerMethod handler) {
 			
 			NoSecurity noSecurity = handler.getMethodAnnotation(NoSecurity.class);
 			
@@ -69,6 +64,25 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		/* Does not need afterCompletion implementation */
+	}
+
+	/**
+	 * Set the flag authDisabled.
+	 * 
+	 * @param authDisabled
+	 */
+	public void setAuthDisabled(@Value(JWTAUTH.AUTH_DISABLED) boolean authDisabled) {
+		this.authDisabled = authDisabled;
+	}
+
+	/**
+	 * Set the tokenService.
+	 * 
+	 * @param tokenService
+	 */
+	@Autowired
+	public void setTokenService(TokenServiceImpl tokenService) {
+		this.tokenService = tokenService;
 	}
 	
 }

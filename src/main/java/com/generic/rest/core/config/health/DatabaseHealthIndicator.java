@@ -82,7 +82,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 	 * @return product name
 	 */
 	private String getProduct() {
-		return this.jdbcTemplate.execute((ConnectionCallback<String>) this::getProduct);
+		return this.jdbcTemplate != null ? this.jdbcTemplate.execute((ConnectionCallback<String>) this::getProduct) : null;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator implements 
 	 * @return connection status
 	 */
 	private boolean isConnectionValid() {
-		return this.jdbcTemplate.execute((ConnectionCallback<Boolean>) this::isConnectionValid);
+		return this.jdbcTemplate != null && this.jdbcTemplate.execute((ConnectionCallback<Boolean>) this::isConnectionValid);
 	}
 
 	/**

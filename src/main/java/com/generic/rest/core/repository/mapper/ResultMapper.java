@@ -26,7 +26,7 @@ public interface ResultMapper<E extends BaseEntity> {
 	 * @return List of mapped entities
 	 * @throws ReflectiveOperationException
 	 */
-	List<E> mapResultSet(Class<E> entityClass, List<Object> result, List<Selection<? extends Object>> projection) throws MapperException;
+	<X extends Object> List<E> mapResultSet(Class<E> entityClass, List<Object> result, List<Selection<X>> projection) throws MapperException;
 
 	
 

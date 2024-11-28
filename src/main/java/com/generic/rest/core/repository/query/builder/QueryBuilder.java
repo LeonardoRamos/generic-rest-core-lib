@@ -26,18 +26,19 @@ public interface QueryBuilder<E> {
 	 * @param projection
 	 * @return true if selection has multi valued / collection projection, false otherwise.
 	 */
-	boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection);
+	boolean containsMultiValuedProjection(List<Selection<Object>> projection);
 
 	/**
 	 * Build group by fields selection from {@link RequestFilter}.
 	 * 
+	 * @param <X>
 	 * @param requestFilter
 	 * @param root
 	 * @param entityClass
 	 * @return Selection of group by fields
 	 * @throws BadRequestApiException
 	 */
-	List<Selection<? extends Object>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass)
+	<X extends Object> List<Selection<X>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass)
 			throws BadRequestApiException;
 
 	/**
@@ -49,12 +50,13 @@ public interface QueryBuilder<E> {
 	 * @return Selection of projection fields
 	 * @throws BadRequestApiException
 	 */
-	List<Selection<? extends Object>> getProjectionFields(RequestFilter requestFilter, Root<?> root,
+	<X extends Object> List<Selection<X>> getProjectionFields(RequestFilter requestFilter, Root<?> root,
 			Class<E> entityClass) throws BadRequestApiException;
 
 	/**
 	 * Build aggregation fields selection from {@link RequestFilter}.
 	 * 
+	 * @param <X>
 	 * @param root
 	 * @param criteriaBuilder
 	 * @param entityClass
@@ -62,12 +64,13 @@ public interface QueryBuilder<E> {
 	 * @return Selection of aggregation fields
 	 * @throws BadRequestApiException
 	 */
-	List<Selection<? extends Object>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder,
+	<X extends Object> List<Selection<X>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder,
 			Class<E> entityClass, RequestFilter requestFilter) throws BadRequestApiException;
 
 	/**
 	 * Build a list of {@link Predicate} according to a query filter of a given {@link RequestFilter}.
 	 * 
+	 * @param <X>
 	 * @param entityClass
 	 * @param requestFilter
 	 * @param criteriaBuilder

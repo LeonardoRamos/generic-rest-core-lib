@@ -60,7 +60,18 @@ public abstract class BaseApiRestServiceImpl<E extends BaseApiEntity, R extends 
 			throw new BadRequestApiException(String.format(MSGERROR.BAD_REQUEST_ERROR, id));
 		}
 
-		return this.update(id.toString(), entity);
+		if (entity.getId() == null) {
+			E entityDatabase = this.getByExternalId(id.toString());
+			entity.setId(entityDatabase.getId());
+		}
+
+		entity.setUpdateDate(Calendar.getInstance());
+      
+		if (entity.isActive()) {
+			entity.setDeleteDate(null);
+		}
+      
+		return this.getRepository().saveAndFlush(entity);
 	}
 	
 	/**

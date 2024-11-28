@@ -1,4 +1,4 @@
-package com.generic.rest.core.service;
+package com.generic.rest.core.service.auth;
 
 import java.util.Map;
 

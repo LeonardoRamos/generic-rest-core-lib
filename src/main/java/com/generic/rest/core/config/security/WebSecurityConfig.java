@@ -27,7 +27,6 @@ import com.generic.rest.core.BaseConstants.JWTAUTH;
 @Configuration
 public class WebSecurityConfig implements WebMvcConfigurer {
 	
-	@Autowired
 	private AuthorizationInterceptor authorizationInterceptor;
 
 	/**
@@ -84,5 +83,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         
         return source;
     }
+
+	/**
+	 * Set the authorizationInterceptor.
+	 * 
+	 * @param authorizationInterceptor
+	 */
+	@Autowired
+	public void setAuthorizationInterceptor(AuthorizationInterceptor authorizationInterceptor) {
+		this.authorizationInterceptor = authorizationInterceptor;
+	}
     
+	
 }

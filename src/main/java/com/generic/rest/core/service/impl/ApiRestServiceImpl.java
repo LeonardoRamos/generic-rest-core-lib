@@ -32,7 +32,6 @@ import com.generic.rest.core.service.ApiRestService;
 @Service
 public abstract class ApiRestServiceImpl<E extends BaseEntity, R extends BaseRepository<E>> implements ApiRestService<E> {
 	
-	@Autowired
 	private ApiRepository<E> apiRepository;
 	
 	protected abstract R getRepository();
@@ -176,5 +175,15 @@ public abstract class ApiRestServiceImpl<E extends BaseEntity, R extends BaseRep
    	 * @throws ApiException
    	 */
    	public abstract E save(E entity) throws ApiException;
-	
+
+   	/**
+   	 * Set the apiRepository.
+   	 * 
+   	 * @param apiRepository
+   	 */
+   	@Autowired
+   	public void setApiRepository(ApiRepository<E> apiRepository) {
+		this.apiRepository = apiRepository;
+	}
+   	
 }

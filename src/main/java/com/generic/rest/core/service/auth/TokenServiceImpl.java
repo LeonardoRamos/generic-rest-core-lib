@@ -1,4 +1,4 @@
-package com.generic.rest.core.service.impl;
+package com.generic.rest.core.service.auth;
 
 import java.util.Base64;
 import java.util.Date;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.generic.rest.core.BaseConstants.JWTAUTH;
 import com.generic.rest.core.BaseConstants.MSGERROR;
 import com.generic.rest.core.domain.AuthEntity;
-import com.generic.rest.core.service.TokenService;
 import com.generic.rest.core.util.StringParserUtils;
 
 import io.jsonwebtoken.Claims;
@@ -34,7 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @Service
 @SuppressWarnings("unchecked")
-public class TokenServiceImpl implements TokenService {
+public final class TokenServiceImpl implements TokenService {
 	
 	private static final Logger lOGGER = LoggerFactory.getLogger(TokenServiceImpl.class);
 

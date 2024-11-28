@@ -115,7 +115,7 @@ public class ApiRepository<E extends BaseEntity> {
 		CriteriaQuery<Object> query = criteriaBuilder.createQuery(Object.class);
 		Root<?> root = query.from(entityClass);
 
-		List<Selection<? extends Object>> projection = this.queryBuilder.getProjectionFields(requestFilter, root, entityClass);
+		List<Selection<Object>> projection = this.queryBuilder.getProjectionFields(requestFilter, root, entityClass);
 		
 		if (!projection.isEmpty() && (projection.size() == 1 || !this.queryBuilder.containsMultiValuedProjection(projection))) {
 			query.multiselect(projection.toArray(new Selection[]{}));
@@ -171,7 +171,7 @@ public class ApiRepository<E extends BaseEntity> {
 		CriteriaQuery<Object> query = criteriaBuilder.createQuery(Object.class);
 		Root<?> root = query.from(entityClass);
 
-		List<Selection<? extends Object>> aggregationFields = this.queryBuilder.getAggregateSelection(root, criteriaBuilder, entityClass, requestFilter);
+		List<Selection<Object>> aggregationFields = this.queryBuilder.getAggregateSelection(root, criteriaBuilder, entityClass, requestFilter);
 		
 		if (aggregationFields.isEmpty()) {
 			throw new BadRequestApiException(String.format(MSGERROR.INVALID_AGGREGATION_ERROR, requestFilter));
@@ -191,7 +191,7 @@ public class ApiRepository<E extends BaseEntity> {
 			query.orderBy(orders);
 		}
 		
-		List<Selection<? extends Object>> groupBy = this.queryBuilder.getGroupByFields(requestFilter, root, entityClass);
+		List<Selection<Object>> groupBy = this.queryBuilder.getGroupByFields(requestFilter, root, entityClass);
 		query.groupBy(groupBy.toArray(new Expression[]{}));
 		
 		try {

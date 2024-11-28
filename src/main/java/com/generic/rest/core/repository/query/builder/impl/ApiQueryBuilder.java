@@ -42,7 +42,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean containsMultiValuedProjection(List<Selection<? extends Object>> projection) {
+	public boolean containsMultiValuedProjection(List<Selection<Object>> projection) {
 		if (projection == null || projection.isEmpty()) {
 			return false;
 		}
@@ -62,7 +62,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Selection<? extends Object>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
+	public <X extends Object> List<Selection<X>> getGroupByFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
 			return this.buildProjectionSelection(root, entityClass, groupByFields);
@@ -76,7 +76,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Selection<? extends Object>> getProjectionFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
+	public <X extends Object> List<Selection<X>> getProjectionFields(RequestFilter requestFilter, Root<?> root, Class<E> entityClass) throws BadRequestApiException {
 		try {
 			List<String> projectionFields = StringParserUtils.splitStringList(requestFilter.getProjection(), ',');
 			return this.buildProjectionSelection(root, entityClass, projectionFields);
@@ -95,10 +95,10 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * @return Selection of group by fields
 	 * @throws NoSuchFieldException
 	 */
-	private List<Selection<? extends Object>> buildProjectionSelection(Root<?> root, Class<E> entityClass,
+	private <X extends Object> List<Selection<X>> buildProjectionSelection(Root<?> root, Class<E> entityClass,
 			List<String> projectionFields) throws NoSuchFieldException {
 		
-		List<Selection<? extends Object>> projection = new ArrayList<>();
+		List<Selection<X>> projection = new ArrayList<>();
 		
 		if (!projectionFields.isEmpty()) {
 			
@@ -115,7 +115,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Selection<? extends Object>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
+	public <X extends Object> List<Selection<X>> getAggregateSelection(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
 			RequestFilter requestFilter) throws BadRequestApiException {
 		try {
 			List<String> sumFields = StringParserUtils.splitStringList(requestFilter.getSum(), ',');
@@ -124,7 +124,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 			List<String> countDistinctFields = StringParserUtils.splitStringList(requestFilter.getCountDistinct(), ',');
 			List<String> groupByFields = StringParserUtils.splitStringList(requestFilter.getGroupBy(), ',');
 			
-			List<Selection<? extends Object>> aggregationFields = new ArrayList<>();
+			List<Selection<X>> aggregationFields = new ArrayList<>();
 			
 			if (!sumFields.isEmpty()) {
 				this.addAggregationFields(root, criteriaBuilder, entityClass, sumFields, aggregationFields, AggregateFunction.SUM.name());
@@ -164,8 +164,8 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	 * @param aggregateFunction
 	 * @throws NoSuchFieldException
 	 */
-	private void addAggregationFields(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
-			List<String> requestFields, List<Selection<? extends Object>> aggregationFields, String aggregateFunction) throws NoSuchFieldException {
+	private <X extends Object> void addAggregationFields(Root<?> root, CriteriaBuilder criteriaBuilder, Class<E> entityClass,
+			List<String> requestFields, List<Selection<X>> aggregationFields, String aggregateFunction) throws NoSuchFieldException {
 		
 		for (String fieldName : requestFields) {
 			List<Field> fields = splitFields(entityClass, fieldName);
@@ -177,10 +177,10 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 				aggregationFields.add(criteriaBuilder.avg(this.getFieldExpressionPath(fields, root)));
 				
 			} else if (AggregateFunction.isCountFunction(aggregateFunction)) {
-				aggregationFields.add(criteriaBuilder.count(this.getFieldExpressionPath(fields, root)));
+				aggregationFields.add((Selection<X>) criteriaBuilder.count(this.getFieldExpressionPath(fields, root)));
 				
 			} else if (AggregateFunction.isCountDistinctFunction(aggregateFunction)) {
-				aggregationFields.add(criteriaBuilder.countDistinct(this.getFieldExpressionPath(fields, root)));
+				aggregationFields.add((Selection<X>) criteriaBuilder.countDistinct(this.getFieldExpressionPath(fields, root)));
 				
 			} else {
 				aggregationFields.add(this.getFieldExpressionPath(fields, root));
