@@ -20,6 +20,7 @@ public interface ResultMapper<E extends BaseEntity> {
 	/**
 	 * Map result from JPA query.
 	 * 
+	 * @param <X>
 	 * @param entityClass
 	 * @param result
 	 * @param projection

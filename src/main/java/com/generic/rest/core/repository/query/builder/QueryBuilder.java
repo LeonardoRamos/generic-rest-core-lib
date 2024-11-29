@@ -44,6 +44,7 @@ public interface QueryBuilder<E> {
 	/**
 	 * Build projection fields selection from {@link RequestFilter}.
 	 * 
+	 * @param <X>
 	 * @param requestFilter
 	 * @param root
 	 * @param entityClass
@@ -70,7 +71,6 @@ public interface QueryBuilder<E> {
 	/**
 	 * Build a list of {@link Predicate} according to a query filter of a given {@link RequestFilter}.
 	 * 
-	 * @param <X>
 	 * @param entityClass
 	 * @param requestFilter
 	 * @param criteriaBuilder

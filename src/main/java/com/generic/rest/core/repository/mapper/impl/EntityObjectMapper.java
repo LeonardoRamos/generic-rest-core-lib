@@ -56,6 +56,7 @@ public class EntityObjectMapper<E extends BaseEntity> implements EntityMapper<E>
 	/**
 	 * Verify if fieldName is list of {@link Selection} projection.
 	 * 
+	 * @param <X>
 	 * @param fieldName
 	 * @param projection
 	 * @return true if fieldName is in projection false otherwise
