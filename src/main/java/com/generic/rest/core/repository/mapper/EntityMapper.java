@@ -39,6 +39,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	/**
 	 * Map result from JPA query into an actual entity <E>.
 	 * 
+	 * @param <X>
 	 * @param entityClass
 	 * @param row
 	 * @param projection
@@ -50,6 +51,7 @@ public interface EntityMapper<E extends BaseEntity> {
 	/**
 	 * Map the projection returned from JPA query into entity <E> fields and aggregation fields.
 	 * 
+	 * @param <X>
 	 * @param entityClass
 	 * @param projection
 	 * @param row

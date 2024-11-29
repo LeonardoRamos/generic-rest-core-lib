@@ -89,6 +89,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	/**
 	 * Build list of selection of a given projection by its real classes types.
 	 * 
+	 * @param <X>
 	 * @param root
 	 * @param entityClass
 	 * @param projectionFields
@@ -156,6 +157,7 @@ public class ApiQueryBuilder<E> implements QueryBuilder<E> {
 	/**
 	 * Add aggregation filter path to an existing JPA {@link CriteriaBuilder}.
 	 * 
+	 * @param <X>
 	 * @param root
 	 * @param criteriaBuilder
 	 * @param entityClass
